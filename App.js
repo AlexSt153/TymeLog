@@ -1,9 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { enableScreens } from 'react-native-screens';
-import Navigation from './app/Navigation';
-
-enableScreens();
+import Navigation from './app/navigation';
 
 export default function App() {
   return (

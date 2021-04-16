@@ -6,10 +6,10 @@ export const useStore = create(
   persist(
     (set) => ({
       loggedIn: false,
-      logIn: () => set((state) => ({ loggedIn: true })),
-      logOut: () => set((state) => ({ loggedIn: false })),
-      supabaseUserID: '',
-      setSupabaseUserID: (supabaseUserID) => set((state) => ({ supabaseUserID })),
+      logIn: () => set(() => ({ loggedIn: true })),
+      logOut: () => set(() => ({ loggedIn: false })),
+      session: {},
+      setSession: (session) => set(() => ({ session })),
     }),
     {
       name: 'main-storage',

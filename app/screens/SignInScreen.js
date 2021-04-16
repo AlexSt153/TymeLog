@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { signInUser } from '../../lib/supabase';
+import { signInUser, supabase } from '../../lib/supabase';
 import { useStore } from '../store';
 
 const styles = StyleSheet.create({
@@ -14,7 +14,10 @@ const styles = StyleSheet.create({
 
 export default function SignInScreen() {
   const navigation = useNavigation();
+
   const logIn = useStore((state) => state.logIn);
+  const setSession = useStore((state) => state.setSession);
+
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
 
@@ -22,6 +25,9 @@ export default function SignInScreen() {
     signInUser(user, password)
       .then((user) => {
         console.log(`user`, user);
+        const session = supabase.auth.session();
+
+        setSession(session);
         logIn();
       })
       .catch((error) => console.log(`error`, error));

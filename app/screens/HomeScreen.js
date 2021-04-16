@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { Surface, Title, Text, FAB } from 'react-native-paper';
+import BackgroundLocationTask from '../BackgroundLocationTask';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -30,6 +31,7 @@ export default function HomeScreen() {
         </Surface>
         <FAB style={styles.fab} small icon="plus" onPress={() => console.log('Pressed')} />
       </View>
+      <BackgroundLocationTask />
     </SafeAreaView>
   );
 }
