@@ -17,6 +17,7 @@
     "crypto-js": "^4.0.0",
     "date-fns": "^2.20.2",
     "deepmerge": "^4.2.2",
+    "easy-db-react-native": "^1.9.2",
     "expo": "^41.0.0",
     "expo-background-fetch": "~9.1.0",
     "expo-blur": "~9.0.3",

@@ -1669,7 +1669,7 @@
     "@babel/runtime" "^7.7.2"
     regenerator-runtime "^0.13.3"
 
-"@react-native-async-storage/async-storage@^1.13.0":
+"@react-native-async-storage/async-storage@^1.13.0", "@react-native-async-storage/async-storage@^1.14.1":
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/@react-native-async-storage/async-storage/-/async-storage-1.15.2.tgz#895898363fbb8f6db477629fd4ba0b013fe27484"
   integrity sha512-E1SajKtyeLwi6JVfMZQx+I01z3ZvA0/O2e09EVFzU75YK0696S5N2CqeKlxAZQFVSvzh+Jfq0q412Kdkuh+l6A==
@@ -2977,6 +2977,19 @@ dotenv@^8.0.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
+
+easy-db-core@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/easy-db-core/-/easy-db-core-1.9.2.tgz#9f35ee693402edbb3c67c51beb4aac6b28d96603"
+  integrity sha512-gua/o+/ACuMXIH6C8EnTpCj8U90Fv0o/ZLGCwomtPp0uG5v4mxJDOd7yMO2096WUIBw7u1R88o5S9KQ39bt7Gw==
+
+easy-db-react-native@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/easy-db-react-native/-/easy-db-react-native-1.9.2.tgz#8c5652c8e8dfec02e277ca217b9002cbaf153f12"
+  integrity sha512-mAjIXgr2TtNkZxFzz1jsTkYJaFfvoTw6Oa3SE0loKna7/+9bAAREzbA8btKq56SlD/MNltxz4onT81L2REuMwA==
+  dependencies:
+    "@react-native-async-storage/async-storage" "^1.14.1"
+    easy-db-core "^1.9.2"
 
 ee-first@1.1.1:
   version "1.1.1"

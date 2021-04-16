@@ -3,9 +3,15 @@ import { Platform } from 'react-native';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import { insert } from 'easy-db-react-native';
 
 const isWeb = Platform.OS === 'web';
 const LOCATION_TASK_NAME = 'background-location-task';
+
+const insertBooking = async (location) => {
+  const idOfRow = await insert('bookings', { location });
+  console.log(`idOfRow`, idOfRow);
+};
 
 TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (error) {
@@ -17,6 +23,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     const { locations } = data;
     // do something with the locations captured in the background
     console.log(`locations`, locations);
+    insertBooking(locations[0]);
     return locations ? BackgroundFetch.Result.NewData : BackgroundFetch.Result.NoData;
   }
 });
