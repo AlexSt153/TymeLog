@@ -19,7 +19,7 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <Title>Map!</Title>
-      <MapView style={styles.map} />
+      <MapView style={styles.map} showsUserLocation />
     </View>
   );
 }

@@ -35,6 +35,7 @@ export default function Navigation() {
   const session = supabase.auth.session();
   const scheme = useColorScheme();
 
+  console.log(`loggedIn`, loggedIn);
   console.log(`session`, session);
 
   return (
