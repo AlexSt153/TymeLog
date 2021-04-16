@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 
+const isWeb = Platform.OS === 'web';
 const LOCATION_TASK_NAME = 'background-location-task';
 
 TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
@@ -60,7 +62,7 @@ export default function BackgroundLocationTask() {
   useEffect(() => {
     console.log(`Task ${LOCATION_TASK_NAME} location permission`, permission);
 
-    if (permission === 'granted') {
+    if (permission === 'granted' && !isWeb) {
       const startLocationTracking = async () => {
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           accuracy: Location.Accuracy.Balanced,
