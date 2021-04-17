@@ -7,16 +7,32 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
 
-export default function HistoryScreen() {
+export default function HistoryScreen({ navigation }) {
+  const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState([]);
 
-  useEffect(() => {
+  const getBookingsFromDB = () => {
+    setRefreshing(true);
     select('bookings').then((data) => {
       const arrayOfObj = Object.entries(data).map((e) => ({ [e[0]]: e[1] }));
 
-      setBookings(arrayOfObj.reverse());
+      setBookings(arrayOfObj.reverse());                                  
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // The screen is focused
+      getBookingsFromDB();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    setRefreshing(false);
+  }, [bookings]);
 
   return (
     <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
@@ -25,6 +41,8 @@ export default function HistoryScreen() {
         <FlatList
           style={{ flex: 1, width: '100%' }}
           data={bookings}
+          refreshing={refreshing}
+          onRefresh={() => getBookingsFromDB()}
           renderItem={({ item }) => (
             <Surface
               style={{

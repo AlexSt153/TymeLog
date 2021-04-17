@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { Surface, Title, Text, FAB } from 'react-native-paper';
+import * as Location from 'expo-location';
+import { insert } from 'easy-db-react-native';
 import BackgroundLocationTask from '../BackgroundLocationTask';
 
 const styles = StyleSheet.create({
@@ -29,7 +31,22 @@ export default function HomeScreen() {
         <Surface style={styles.surface}>
           <Text>Placeholder!</Text>
         </Surface>
-        <FAB style={styles.fab} small icon="plus" onPress={() => console.log('Pressed')} />
+        <FAB
+          style={styles.fab}
+          small
+          icon="plus"
+          onPress={async () => {
+            console.log('Pressed');
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status === 'granted') {
+              const location = await Location.getLastKnownPositionAsync();
+              if (location !== null) {
+                const idOfRow = await insert('bookings', { location });
+                console.log(`idOfRow`, idOfRow);
+              }
+            }
+          }}
+        />
       </View>
       <BackgroundLocationTask />
     </SafeAreaView>
