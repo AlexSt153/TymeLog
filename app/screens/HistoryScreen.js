@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, StyleSheet, FlatList } from 'react-native';
-import { Surface, Title, Text } from 'react-native-paper';
+import { Divider, Title } from 'react-native-paper';
 import { select } from 'easy-db-react-native';
+import ReverseGeocodeLocation from '../components/ReverseGeocodeLocation';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -14,9 +15,12 @@ export default function HistoryScreen({ navigation }) {
   const getBookingsFromDB = () => {
     setRefreshing(true);
     select('bookings').then((data) => {
-      const arrayOfObj = Object.entries(data).map((e) => ({ [e[0]]: e[1] }));
+      const arrayOfObj = Object.entries(data).map((e) => {
+        // console.log(`e`, e);
+        return { index: e[0], data: e[1] };
+      });
 
-      setBookings(arrayOfObj.reverse());                                  
+      setBookings(arrayOfObj.reverse());
     });
   };
 
@@ -35,16 +39,17 @@ export default function HistoryScreen({ navigation }) {
   }, [bookings]);
 
   return (
-    <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
+    <SafeAreaView style={{ flex: 1, marginLeft: 20 }}>
       <Title>History!</Title>
       <View style={styles.container}>
         <FlatList
-          style={{ flex: 1, width: '100%' }}
+          style={{ flex: 1, width: '100%', paddingRight: 20 }}
           data={bookings}
           refreshing={refreshing}
           onRefresh={() => getBookingsFromDB()}
+          keyExtractor={(item) => item.index}
           renderItem={({ item }) => (
-            <Surface
+            <View
               style={{
                 marginBottom: 10,
                 padding: 8,
@@ -55,9 +60,10 @@ export default function HistoryScreen({ navigation }) {
                 elevation: 4,
               }}
             >
-              <Text>{JSON.stringify(item)}</Text>
-            </Surface>
+              <ReverseGeocodeLocation coords={item.data.location.coords} />
+            </View>
           )}
+          ItemSeparatorComponent={() => <Divider />}
         />
       </View>
     </SafeAreaView>

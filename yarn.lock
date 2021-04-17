@@ -1676,6 +1676,13 @@
   dependencies:
     deep-assign "^3.0.0"
 
+"@react-native-community/async-storage@^1.8.1":
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/async-storage/-/async-storage-1.12.1.tgz#25f821b4f6b13abe005ad67e47c6f1cee9f27b24"
+  integrity sha512-70WGaH3PKYASi4BThuEEKMkyAgE9k7VytBqmgPRx3MzJx9/MkspwqJGmn3QLCgHLIFUgF1pit2mWICbRJ3T3lg==
+  dependencies:
+    deep-assign "^3.0.0"
+
 "@react-native-community/cli-debugger-ui@^4.13.1":
   version "4.13.1"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-debugger-ui/-/cli-debugger-ui-4.13.1.tgz#07de6d4dab80ec49231de1f1fbf658b4ad39b32c"
@@ -5530,6 +5537,13 @@ react-native-appearance@~0.3.3:
     fbemitter "^2.1.1"
     invariant "^2.2.4"
     use-subscription "^1.0.0"
+
+react-native-cache@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-cache/-/react-native-cache-2.0.1.tgz#a90227672ca3b32e1288910fc149df95f4f2f007"
+  integrity sha512-nA/4xz71B/rPy/9s9gJd11XbMh3NYo8g6uO+KAbt7Lbr/9AdLsEgWpmyAMEWj4GVOU37JH5ds7wzowYqpfy2ew==
+  dependencies:
+    "@react-native-community/async-storage" "^1.8.1"
 
 react-native-dotenv@^2.5.5:
   version "2.5.5"
