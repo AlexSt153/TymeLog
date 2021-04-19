@@ -13,7 +13,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
@@ -23,21 +25,29 @@
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "UIBackgroundModes": ["location", "fetch"],
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
         "UISupportsDocumentBrowser": true,
         "UIFileSharingEnabled": true,
         "LSSupportsOpeningDocumentsInPlace": true,
         "NSLocationWhenInUseUsageDescription": "In order to use location tracking when using the app",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "In order to use location tracking when using the app and in background",
         "NSLocationAlwaysUsageDescription": "In order to use location tracking when app is in background"
-      }
+      },
+      "bundleIdentifier": "com.alexst15.TymeLog"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000"
       },
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.alexst15.TymeLog"
     },
     "web": {
       "favicon": "./assets/favicon.png"

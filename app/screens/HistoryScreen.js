@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, StyleSheet, FlatList } from 'react-native';
-import { Divider, Title } from 'react-native-paper';
-import { select } from 'easy-db-react-native';
+import { Divider, Title, FAB } from 'react-native-paper';
+import { select, remove } from 'easy-db-react-native';
 import ReverseGeocodeLocation from '../components/ReverseGeocodeLocation';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  fab: {
+    position: 'absolute',
+    margin: 30,
+    right: 0,
+    bottom: 0,
+  },
 });
 
 export default function HistoryScreen({ navigation }) {
@@ -64,6 +70,16 @@ export default function HistoryScreen({ navigation }) {
             </View>
           )}
           ItemSeparatorComponent={() => <Divider />}
+        />
+        <FAB
+          style={styles.fab}
+          small
+          icon="delete"
+          onPress={async () => {
+            console.log('Pressed');
+            await remove('bookings');
+            getBookingsFromDB();
+          }}
         />
       </View>
     </SafeAreaView>

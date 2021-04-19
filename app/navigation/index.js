@@ -25,6 +25,7 @@ export default function Navigation() {
   const session = useStore((state) => state.session);
   const setSession = useStore((state) => state.setSession);
 
+  const theme = useStore((state) => state.theme);
   const scheme = useColorScheme();
 
   useEffect(() => {
@@ -37,10 +38,23 @@ export default function Navigation() {
     refreshSession();
   }, []);
 
+  const preferredTheme = () => {
+    switch (theme) {
+      case 'system':
+        return scheme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme;
+      case 'dark':
+        return CombinedDarkTheme;
+      case 'light':
+        return CombinedDefaultTheme;
+      default:
+        return scheme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme;
+    }
+  };
+
   return (
     <AppearanceProvider>
-      <PaperProvider theme={scheme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme}>
-        <NavigationContainer theme={scheme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme}>
+      <PaperProvider theme={preferredTheme()}>
+        <NavigationContainer theme={preferredTheme()}>
           {loggedIn === true && session ? <AppStack /> : <AuthStack />}
         </NavigationContainer>
       </PaperProvider>
