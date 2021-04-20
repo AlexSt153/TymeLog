@@ -3,15 +3,11 @@ import { Platform } from 'react-native';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
-import { insert } from 'easy-db-react-native';
+import { insert } from 'expo-sqlite-query-helper';
+import { format } from 'date-fns';
 
 const isWeb = Platform.OS === 'web';
 const LOCATION_TASK_NAME = 'background-location-task';
-
-const insertBooking = async (location) => {
-  const idOfRow = await insert('bookings', { location });
-  console.log(`idOfRow`, idOfRow);
-};
 
 TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
   if (error) {
@@ -23,7 +19,21 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     const { locations } = data;
     // do something with the locations captured in the background
     console.log(`locations`, locations);
-    insertBooking(locations[0]);
+
+    if (Array.isArray(locations)) {
+      insert('bookings', [
+        {
+          timestamp: format(new Date(locations[0].timestamp), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+          data: JSON.stringify({ location: locations[0] }),
+          encrypted: 'false',
+        },
+      ])
+        .then(({ row, rowAffected, insertID, lastQuery }) => {
+          console.log('success', row, rowAffected, insertID, lastQuery);
+        })
+        .catch((e) => console.log(e));
+    }
+
     return locations ? BackgroundFetch.Result.NewData : BackgroundFetch.Result.NoData;
   }
 });

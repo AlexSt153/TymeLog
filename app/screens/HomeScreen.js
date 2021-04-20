@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { Surface, Title, Text, FAB } from 'react-native-paper';
+import Database, { createTable, insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
-import { insert } from 'easy-db-react-native';
+import format from 'date-fns/format';
 import BackgroundLocationTask from '../BackgroundLocationTask';
 
 const styles = StyleSheet.create({
@@ -24,6 +25,22 @@ const styles = StyleSheet.create({
 });
 
 export default function HomeScreen() {
+  Database('tymelog.db');
+
+  useEffect(() => {
+    createTable('bookings', {
+      id: 'INTEGER PRIMARY KEY',
+      origin: 'TEXT',
+      type: 'TEXT',
+      timestamp: 'TEXT',
+      data: 'TEXT',
+      encrypted: 'TEXT',
+      synced: 'TEXT',
+    }).then(({ row, rowAffected, insertID, lastQuery }) =>
+      console.log('success', row, rowAffected, insertID, lastQuery)
+    );
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
       <Title>Home!</Title>
@@ -41,8 +58,19 @@ export default function HomeScreen() {
             if (status === 'granted') {
               const location = await Location.getLastKnownPositionAsync();
               if (location !== null) {
-                const idOfRow = await insert('bookings', { location });
-                console.log(`idOfRow`, idOfRow);
+                console.log('location :>> ', location);
+
+                insert('bookings', [
+                  {
+                    timestamp: format(new Date(location.timestamp), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+                    data: JSON.stringify({ location }),
+                    encrypted: 'false',
+                  },
+                ])
+                  .then(({ row, rowAffected, insertID, lastQuery }) => {
+                    console.log('success', row, rowAffected, insertID, lastQuery);
+                  })
+                  .catch((e) => console.log(e));
               }
             }
           }}
