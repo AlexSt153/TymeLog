@@ -9,6 +9,11 @@
 - Sync data to supabase cloud database
 - Additional browser support
 
+## Features
+
+- Light/dark mode toggle
+- Cross platform
+
 ## Requirements
 
 - Node.js / npm
