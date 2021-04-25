@@ -1,5 +1,14 @@
 # TymeLog
 
+## Roadmap
+
+- Keep track of working hours
+- Add background location tracking and geofencing
+- Show notifications when leaving areas to add notes
+- Encrypt geospatial data
+- Sync data to supabase cloud database
+- Additional browser support
+
 ## Requirements
 
 - Node.js / npm
