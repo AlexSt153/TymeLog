@@ -20,6 +20,8 @@ export const useStore = create(
       setMasterpwd: (masterpwd) => set(() => ({ masterpwd })),
       cloudSync: false,
       setCloudSync: (cloudSync) => set(() => ({ cloudSync })),
+      lastBooking: '',
+      setLastBooking: (lastBooking) => set(() => ({ lastBooking })),
     }),
     {
       name: 'main-storage',

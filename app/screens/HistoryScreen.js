@@ -20,7 +20,7 @@ export default function HistoryScreen({ navigation }) {
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
-    const result = await search('bookings');
+    const result = await search('bookings', null, { timestamp: 'DESC' });
     if (Array.isArray(result.rows._array)) {
       setBookings(result.rows._array);
     }
@@ -50,7 +50,9 @@ export default function HistoryScreen({ navigation }) {
             onRefresh={() => getBookingsFromDB()}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => {
+              // console.log(`item`, item);
               const data = JSON.parse(item.data);
+
               return (
                 <View
                   style={{
@@ -63,6 +65,7 @@ export default function HistoryScreen({ navigation }) {
                     elevation: 4,
                   }}
                 >
+                  <Text>{item.type}</Text>
                   <Text>{item.timestamp}</Text>
                   <ReverseGeocodeLocation coords={data.location.coords} />
                 </View>

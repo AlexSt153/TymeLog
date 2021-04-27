@@ -4,7 +4,6 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
-import { format } from 'date-fns';
 
 const isWeb = Platform.OS === 'web';
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -23,9 +22,8 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     if (Array.isArray(locations)) {
       insert('bookings', [
         {
-          timestamp: format(new Date(locations[0].timestamp), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+          type: 'background',
           data: JSON.stringify({ location: locations[0] }),
-          encrypted: 'false',
         },
       ])
         .then(({ row, rowAffected, insertID, lastQuery }) => {
