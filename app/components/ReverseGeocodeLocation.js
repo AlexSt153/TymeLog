@@ -25,7 +25,7 @@ export default function ReverseGeocodeLocation({ coords }) {
   }, []);
 
   useEffect(() => {
-    console.log(`location`, location);
+    // console.log(`location`, location);
   }, [location]);
 
   if (location === null) return null;

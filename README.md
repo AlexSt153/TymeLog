@@ -1,4 +1,4 @@
-# TymeLog
+# TymeLog - work in progress
 
 ## Roadmap
 
