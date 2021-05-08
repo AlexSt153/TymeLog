@@ -54,8 +54,11 @@ export default function HomeScreen() {
     if (lastBooking.type === 'start') {
       const timePassedInterval = setInterval(() => {
         const seconds = differenceInSeconds(new Date(), lastBooking.timestamp);
-        const helperDate = addSeconds(new Date(0), seconds);
-        console.log(`helperDate`, helperDate);
+        // console.log('seconds :>> ', seconds);
+
+        const helperDate = addSeconds(new Date(), seconds);
+        // console.log(`helperDate :>> `, helperDate);
+
         setLastBookingTimePassed(distanceInWordsStrict(new Date(), helperDate, de));
       }, 1000);
 
@@ -108,9 +111,10 @@ export default function HomeScreen() {
             }}
           >
             <IconButton
+              disabled={lastBooking.type === 'start'}
               icon="play-circle-outline"
               size={30}
-              color={dark ? Colors.green600 : Colors.green200}
+              color={dark ? Colors.green700 : Colors.green100}
               onPress={() => insertBooking('start')}
             />
           </Surface>
@@ -123,9 +127,10 @@ export default function HomeScreen() {
             }}
           >
             <IconButton
+              disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
               icon="pause-circle-outline"
               size={30}
-              color={dark ? Colors.blue600 : Colors.blue200}
+              color={dark ? Colors.blue700 : Colors.blue100}
               onPress={() => insertBooking('pause')}
             />
           </Surface>
@@ -138,9 +143,10 @@ export default function HomeScreen() {
             }}
           >
             <IconButton
+              disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
               icon="stop-circle-outline"
               size={30}
-              color={dark ? Colors.red600 : Colors.red200}
+              color={dark ? Colors.red700 : Colors.red100}
               onPress={() => insertBooking('end')}
             />
           </Surface>
