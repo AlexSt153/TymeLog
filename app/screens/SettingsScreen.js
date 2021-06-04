@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
-import { Title, Button, List, Switch, Checkbox } from 'react-native-paper';
+import { Title, Button, List, Switch } from 'react-native-paper';
+import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
 
 const styles = StyleSheet.create({
@@ -10,7 +11,6 @@ const styles = StyleSheet.create({
 
 export default function SettingsScreen() {
   const { dark } = useTheme();
-  const [darkMode, setDarkMode] = useState(true);
 
   const logOut = useStore((state) => state.logOut);
   const theme = useStore((state) => state.theme);
@@ -31,48 +31,58 @@ export default function SettingsScreen() {
           <List.Item
             title="Use System Light/Dark Mode"
             right={() => (
-              <Checkbox
-                status={darkMode ? 'checked' : 'unchecked'}
-                onPress={() => {
+              <Switch
+                value={theme === 'system'}
+                onValueChange={() => {
                   switch (theme) {
                     case 'system':
                       setTheme(dark ? 'dark' : 'light');
-                      setDarkMode(false);
+
                       break;
                     default:
                       setTheme('system');
-                      setDarkMode(true);
                   }
                 }}
               />
             )}
           />
-          {theme !== 'system' && (
-            <>
-              <List.Item
-                title="Light Theme"
-                right={() => (
-                  <Checkbox
-                    status={theme === 'light' ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setTheme('light');
-                    }}
-                  />
-                )}
-              />
-              <List.Item
-                title="Dark Theme"
-                right={() => (
-                  <Checkbox
-                    status={theme === 'dark' ? 'checked' : 'unchecked'}
-                    onPress={() => {
-                      setTheme('dark');
-                    }}
-                  />
-                )}
-              />
-            </>
-          )}
+          <AnimatePresence>
+            {theme !== 'system' && (
+              <MotiView
+                from={{ height: 0 }}
+                animate={{ height: 100 }}
+                exit={{ height: 0 }}
+                transition={{
+                  type: 'timing',
+                  duration: 350,
+                }}
+                style={{ overflow: 'hidden' }}
+              >
+                <List.Item
+                  title="Light Theme"
+                  right={() => (
+                    <Switch
+                      value={theme === 'light'}
+                      onValueChange={(lightSwitchValue) =>
+                        setTheme(lightSwitchValue ? 'light' : 'dark')
+                      }
+                    />
+                  )}
+                />
+                <List.Item
+                  title="Dark Theme"
+                  right={() => (
+                    <Switch
+                      value={theme === 'dark'}
+                      onValueChange={(darkSwitchValue) =>
+                        setTheme(darkSwitchValue ? 'dark' : 'light')
+                      }
+                    />
+                  )}
+                />
+              </MotiView>
+            )}
+          </AnimatePresence>
           <List.Subheader>GENERAL</List.Subheader>
           <List.Item
             title="Secure settings"
