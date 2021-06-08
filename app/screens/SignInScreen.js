@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { signInUser, supabase } from '../../lib/supabase';
 import { useStore } from '../store';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: { justifyContent: 'center', alignItems: 'center' },
   textInput: { height: 50, width: '80%', marginBottom: 20 },
   row: { width: '80%', flexDirection: 'row', justifyContent: 'space-between' },
   button: {},
@@ -17,6 +17,7 @@ export default function SignInScreen() {
 
   const logIn = useStore((state) => state.logIn);
   const setSession = useStore((state) => state.setSession);
+  const setCloudSync = useStore((state) => state.setCloudSync);
 
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +35,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, justifyContent: 'center' }}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <TextInput
           label="User"
@@ -67,6 +68,19 @@ export default function SignInScreen() {
           </Button>
         </View>
       </KeyboardAvoidingView>
+      <View
+        style={[styles.container, { marginTop: 25, height: 100, justifyContent: 'space-evenly' }]}
+      >
+        <Text>OR</Text>
+        <Button
+          onPress={() => {
+            setCloudSync(false);
+            logIn();
+          }}
+        >
+          use App in offline mode
+        </Button>
+      </View>
     </View>
   );
 }

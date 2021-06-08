@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Divider, Text, FAB, Surface, Colors } from 'react-native-paper';
+import { Divider, Text, Surface, Colors } from 'react-native-paper';
 import { useTheme } from '@react-navigation/native';
-import { search, deleteData } from 'expo-sqlite-query-helper';
+import { search } from 'expo-sqlite-query-helper';
 import ReverseGeocodeLocation from './ReverseGeocodeLocation';
 import { format } from 'date-fns';
 
@@ -18,14 +18,14 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function History({ lastBooking }) {
+export default function History({ lastBooking, refreshHistory }) {
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState([]);
   const { dark } = useTheme();
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
-    const result = await search('bookings', null, { timestamp: 'DESC' });
+    const result = await search('bookings'); // , null, { timestamp: 'DESC' });
     if (Array.isArray(result.rows._array)) {
       setBookings(result.rows._array);
     }
@@ -33,9 +33,10 @@ export default function History({ lastBooking }) {
 
   useEffect(() => {
     getBookingsFromDB();
-  }, [lastBooking]);
+  }, [lastBooking, refreshHistory]);
 
   useEffect(() => {
+    console.log(`bookings`, bookings);
     setRefreshing(false);
   }, [bookings]);
 
@@ -82,8 +83,7 @@ export default function History({ lastBooking }) {
     <View style={styles.container}>
       {bookings.length > 0 ? (
         <FlatList
-          style={{ flex: 1, width: '100%', paddingLeft: 15, paddingRight: 20 }}
-          inverted
+          style={{ flex: 1, width: '100%' }}
           data={bookings}
           refreshing={refreshing}
           onRefresh={() => getBookingsFromDB()}
@@ -98,14 +98,14 @@ export default function History({ lastBooking }) {
             const lastItem = bookings[listItem.index - 1];
 
             const connectLastItem = () => {
-              if (item.type === 'end') return null;
+              if (lastItem.type === 'end') return null;
 
               return (
                 <Surface
                   style={{
                     position: 'absolute',
                     left: 12.5,
-                    bottom: -42,
+                    top: -42,
                     height: 40,
                     width: 2,
                     elevation: 4,
@@ -169,20 +169,10 @@ export default function History({ lastBooking }) {
 
             return <Divider />;
           }}
-          ListHeaderComponent={() => <View style={{ height: 90 }} />}
         />
       ) : (
         <Text style={{ paddingRight: 20 }}>No data</Text>
       )}
-      <FAB
-        style={styles.fab}
-        small
-        icon="delete"
-        onPress={async () => {
-          await deleteData('bookings');
-          getBookingsFromDB();
-        }}
-      />
     </View>
   );
 }

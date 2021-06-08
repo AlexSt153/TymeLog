@@ -2,35 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { View, SafeAreaView } from 'react-native';
 import { Surface, Title, IconButton, Colors } from 'react-native-paper';
-import Database, { createTable, dropTable, insert } from 'expo-sqlite-query-helper';
+import Database, { insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import BackgroundLocationTask from '../BackgroundLocationTask';
 import { useStore } from '../store';
 import History from '../components/History';
+import { createBookingsTable } from '../database';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const { dark } = useTheme();
   const lastBooking = useStore((state) => state.lastBooking);
   const setLastBooking = useStore((state) => state.setLastBooking);
+  const [refreshHistory, setRefreshHistory] = useState(false);
   const [ForegroundPermission, setForegroundPermission] = useState('');
 
   Database('tymelog.db');
 
   useEffect(() => {
-    createTable('bookings', {
-      id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-      origin: 'TEXT',
-      type: 'TEXT',
-      timestamp: 'TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP',
-      data: 'TEXT',
-      encrypted: 'TEXT DEFAULT "false" NOT NULL',
-      synced: 'TEXT DEFAULT "false" NOT NULL',
-    }).then(({ row, rowAffected, insertID, lastQuery }) =>
-      console.log('success', row, rowAffected, insertID, lastQuery)
-    );
-
+    createBookingsTable();
     Location.requestForegroundPermissionsAsync().then((status) => setForegroundPermission(status));
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // Screen was focused
+      setRefreshHistory((prevState) => !prevState);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const insertBooking = async (type) => {
     console.log('type', type);
@@ -59,7 +59,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Title style={{ marginLeft: 20 }}>Home!</Title>
-      <History lastBooking={lastBooking} />
+      <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{
           position: 'absolute',

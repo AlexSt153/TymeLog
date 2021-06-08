@@ -5,7 +5,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.13.0",
@@ -21,7 +25,7 @@
     "expo-background-fetch": "~9.1.0",
     "expo-blur": "~9.0.3",
     "expo-location": "~12.0.4",
-    "expo-notifications": "~0.11.5",
+    "expo-notifications": "~0.11.6",
     "expo-sqlite": "~9.1.0",
     "expo-sqlite-query-helper": "^1.1.4",
     "expo-status-bar": "~1.0.4",
@@ -44,7 +48,9 @@
     "zustand": "^3.4.1"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0"
+    "@babel/core": "~7.9.0",
+    "jest-expo": "^41.0.0",
+    "react-test-renderer": "^17.0.2"
   },
   "private": true
 }

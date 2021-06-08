@@ -4,6 +4,8 @@ import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
 import { Title, Button, List, Switch } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
+import { dropTable } from 'expo-sqlite-query-helper';
+import { createBookingsTable } from '../database';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -103,32 +105,61 @@ export default function SettingsScreen() {
             )}
           />
         </List.Section>
-        <Button
-          mode="logout"
-          onPress={() => {
-            Alert.alert(
-              'Logout',
-              'Are you sure you want to logout?',
-              [
+        <View style={{ flexDirection: 'row' }}>
+          <Button
+            onPress={() => {
+              Alert.alert(
+                'Delete data',
+                'Are you sure you want purge all data from the datebase?',
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Yes!',
+                    onPress: () => {
+                      dropTable('bookings');
+                      createBookingsTable();
+                    },
+                  },
+                ],
                 {
-                  text: 'Cancel',
-                  onPress: () => console.log('Cancel Pressed'),
-                  style: 'cancel',
-                },
+                  cancelable: true,
+                }
+              );
+            }}
+            style={styles.button}
+          >
+            Delete data
+          </Button>
+          <Button
+            onPress={() => {
+              Alert.alert(
+                'Logout',
+                'Are you sure you want to logout?',
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Yes!',
+                    onPress: () => logOut(),
+                  },
+                ],
                 {
-                  text: 'Yes!',
-                  onPress: () => logOut(),
-                },
-              ],
-              {
-                cancelable: true,
-              }
-            );
-          }}
-          style={styles.button}
-        >
-          Logout
-        </Button>
+                  cancelable: true,
+                }
+              );
+            }}
+            style={styles.button}
+          >
+            Logout
+          </Button>
+        </View>
       </View>
     </SafeAreaView>
   );
