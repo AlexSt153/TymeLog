@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
-import { Title, Button, List, Switch } from 'react-native-paper';
+import { Button, List, Switch } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
 import { dropTable } from 'expo-sqlite-query-helper';
@@ -26,7 +26,6 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
-      <Title>Settings!</Title>
       <View style={styles.container}>
         <List.Section style={{ width: '100%' }}>
           <List.Subheader>THEME</List.Subheader>

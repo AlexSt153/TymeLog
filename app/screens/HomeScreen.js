@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
-import { View, SafeAreaView } from 'react-native';
-import { Surface, Title, IconButton, Colors } from 'react-native-paper';
+import { View } from 'react-native';
+import { Surface, IconButton, Colors } from 'react-native-paper';
 import Database, { insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import BackgroundLocationTask from '../BackgroundLocationTask';
@@ -57,8 +57,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Title style={{ marginLeft: 20 }}>Home!</Title>
+    <View style={{ flex: 1 }}>
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{
@@ -119,6 +118,6 @@ export default function HomeScreen({ navigation }) {
         </Surface>
       </View>
       <BackgroundLocationTask />
-    </SafeAreaView>
+    </View>
   );
 }

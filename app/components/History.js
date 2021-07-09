@@ -19,13 +19,14 @@ const styles = StyleSheet.create({
 });
 
 export default function History({ lastBooking, refreshHistory }) {
+  // let listViewRef;
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState([]);
   const { dark } = useTheme();
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
-    const result = await search('bookings'); // , null, { timestamp: 'DESC' });
+    const result = await search('bookings', null, { timestamp: 'DESC' });
     if (Array.isArray(result.rows._array)) {
       setBookings(result.rows._array);
     }
@@ -36,8 +37,9 @@ export default function History({ lastBooking, refreshHistory }) {
   }, [lastBooking, refreshHistory]);
 
   useEffect(() => {
-    console.log(`bookings`, bookings);
+    // console.log(`bookings`, bookings);
     setRefreshing(false);
+    // if (listViewRef) listViewRef.scrollToEnd({ animated: true });
   }, [bookings]);
 
   const backgroundColor = (type) => {
@@ -79,11 +81,33 @@ export default function History({ lastBooking, refreshHistory }) {
     }
   };
 
+  const connectLastItem = (item) => {
+    if (item.type === 'end') return null;
+
+    return (
+      <Surface
+        style={{
+          position: 'absolute',
+          left: 12.5,
+          bottom: -42,
+          height: 40,
+          width: 2,
+          elevation: 4,
+          backgroundColor: lineColor(item.type),
+        }}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       {bookings.length > 0 ? (
         <FlatList
+          // ref={(ref) => {
+          //   listViewRef = ref;
+          // }}
           style={{ flex: 1, width: '100%' }}
+          inverted
           data={bookings}
           refreshing={refreshing}
           onRefresh={() => getBookingsFromDB()}
@@ -96,24 +120,6 @@ export default function History({ lastBooking, refreshHistory }) {
             if (item.type === 'background') return null;
 
             const lastItem = bookings[listItem.index - 1];
-
-            const connectLastItem = () => {
-              if (lastItem.type === 'end') return null;
-
-              return (
-                <Surface
-                  style={{
-                    position: 'absolute',
-                    left: 12.5,
-                    top: -42,
-                    height: 40,
-                    width: 2,
-                    elevation: 4,
-                    backgroundColor: lineColor(item.type),
-                  }}
-                />
-              );
-            };
 
             return (
               <View
@@ -140,7 +146,7 @@ export default function History({ lastBooking, refreshHistory }) {
                     borderWidth: 1,
                   }}
                 >
-                  {_.has(lastItem, 'type') && connectLastItem()}
+                  {_.has(lastItem, 'type') && connectLastItem(item)}
                   <Text
                     style={{
                       fontSize: 20,
@@ -169,6 +175,8 @@ export default function History({ lastBooking, refreshHistory }) {
 
             return <Divider />;
           }}
+          ListHeaderComponent={() => <View style={{ height: 80 }} />}
+          ListFooterComponent={() => <View style={{ height: 50 }} />}
         />
       ) : (
         <Text style={{ paddingRight: 20 }}>No data</Text>

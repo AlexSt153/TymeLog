@@ -10,6 +10,7 @@ import {
   DefaultTheme as PaperDefaultTheme,
   Provider as PaperProvider,
 } from 'react-native-paper';
+import { StatusBar } from 'expo-status-bar';
 import merge from 'deepmerge';
 
 import { useStore } from '../store';
@@ -82,6 +83,7 @@ export default function Navigation() {
     <AppearanceProvider>
       <PaperProvider theme={preferredTheme()}>
         <NavigationContainer theme={preferredTheme()}>
+          <StatusBar style={!theme} />
           <AuthAppStack />
         </NavigationContainer>
       </PaperProvider>
