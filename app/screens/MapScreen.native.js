@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import { Title } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
 import { search } from 'expo-sqlite-query-helper';
+import { useTheme } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,6 +20,8 @@ const styles = StyleSheet.create({
 export default function MapScreen({ navigation }) {
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
+
+  const { dark } = useTheme();
 
   const getBookingsFromDB = async () => {
     const result = await search('bookings');
@@ -54,7 +57,7 @@ export default function MapScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Title>Map!</Title>
-      <MapView style={styles.map} showsUserLocation>
+      <MapView userInterfaceStyle={dark ? 'dark' : 'light'} style={styles.map} showsUserLocation>
         {markers.map((marker, index) => (
           <Marker
             key={index}
