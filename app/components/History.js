@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Divider, Text, Surface, Colors } from 'react-native-paper';
-import { useTheme } from '@react-navigation/native';
 import { search } from 'expo-sqlite-query-helper';
 import ReverseGeocodeLocation from './ReverseGeocodeLocation';
 import { format } from 'date-fns';
@@ -22,7 +21,6 @@ export default function History({ lastBooking, refreshHistory }) {
   // let listViewRef;
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState([]);
-  const { dark } = useTheme();
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
@@ -45,11 +43,24 @@ export default function History({ lastBooking, refreshHistory }) {
   const backgroundColor = (type) => {
     switch (type) {
       case 'start':
-        return dark ? Colors.green200 : Colors.green600;
+        return Colors.green600;
       case 'pause':
-        return dark ? Colors.blue200 : Colors.blue600;
+        return Colors.blue600;
       case 'end':
-        return dark ? Colors.red200 : Colors.red600;
+        return Colors.red600;
+      default:
+        return null;
+    }
+  };
+
+  const textColor = (type) => {
+    switch (type) {
+      case 'start':
+        return Colors.green100;
+      case 'pause':
+        return Colors.blue100;
+      case 'end':
+        return Colors.red100;
       default:
         return null;
     }
@@ -58,11 +69,11 @@ export default function History({ lastBooking, refreshHistory }) {
   const borderColor = (type) => {
     switch (type) {
       case 'start':
-        return dark ? Colors.green600 : Colors.green200;
+        return Colors.green600;
       case 'pause':
-        return dark ? Colors.blue600 : Colors.blue200;
+        return Colors.blue600;
       case 'end':
-        return dark ? Colors.red600 : Colors.red200;
+        return Colors.red600;
       default:
         return null;
     }
@@ -71,11 +82,11 @@ export default function History({ lastBooking, refreshHistory }) {
   const lineColor = (type) => {
     switch (type) {
       case 'start':
-        return dark ? Colors.green200 : Colors.green600;
+        return Colors.green600;
       case 'pause':
-        return dark ? Colors.blue200 : Colors.blue600;
+        return Colors.blue600;
       case 'end':
-        return dark ? Colors.red200 : Colors.red600;
+        return Colors.red600;
       default:
         return null;
     }
@@ -151,8 +162,7 @@ export default function History({ lastBooking, refreshHistory }) {
                     style={{
                       fontSize: 20,
                       paddingTop: 2,
-                      color: Colors.black,
-                      opacity: 0.6,
+                      color: textColor(item.type),
                       textAlign: 'center',
                       textAlignVertical: 'center',
                     }}

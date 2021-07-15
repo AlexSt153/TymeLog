@@ -55,6 +55,19 @@ export default function Navigation() {
     }
   };
 
+  const statusBarStyle = () => {
+    switch (theme) {
+      case 'system':
+        return scheme === 'dark' ? 'light' : 'dark';
+      case 'dark':
+        return 'light';
+      case 'light':
+        return 'dark';
+      default:
+        return scheme === 'dark' ? 'light' : 'dark';
+    }
+  };
+
   const AuthAppStack = () => {
     // console.log(`cloudSync`, cloudSync);
     // console.log(`loggedIn`, loggedIn);
@@ -83,7 +96,7 @@ export default function Navigation() {
     <AppearanceProvider>
       <PaperProvider theme={preferredTheme()}>
         <NavigationContainer theme={preferredTheme()}>
-          <StatusBar style={!theme} />
+          <StatusBar style={statusBarStyle()} />
           <AuthAppStack />
         </NavigationContainer>
       </PaperProvider>

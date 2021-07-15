@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '@react-navigation/native';
 import { View } from 'react-native';
 import { Surface, IconButton, Colors } from 'react-native-paper';
 import Database, { insert } from 'expo-sqlite-query-helper';
@@ -10,7 +9,6 @@ import History from '../components/History';
 import { createBookingsTable } from '../database';
 
 export default function HomeScreen({ navigation }) {
-  const { dark } = useTheme();
   const lastBooking = useStore((state) => state.lastBooking);
   const setLastBooking = useStore((state) => state.setLastBooking);
   const [refreshHistory, setRefreshHistory] = useState(false);
@@ -70,49 +68,43 @@ export default function HomeScreen({ navigation }) {
       >
         <Surface
           style={{
-            backgroundColor: dark ? Colors.green200 : Colors.green600,
-            borderColor: dark ? Colors.green600 : Colors.green200,
+            backgroundColor: Colors.green600,
             borderRadius: 100,
-            borderWidth: 1,
           }}
         >
           <IconButton
             disabled={lastBooking.type === 'start'}
             icon="play-circle-outline"
             size={30}
-            color={dark ? Colors.green700 : Colors.green100}
+            color={Colors.green100}
             onPress={() => insertBooking('start')}
           />
         </Surface>
         <Surface
           style={{
-            backgroundColor: dark ? Colors.blue200 : Colors.blue600,
-            borderColor: dark ? Colors.blue600 : Colors.blue200,
+            backgroundColor: Colors.blue600,
             borderRadius: 100,
-            borderWidth: 1,
           }}
         >
           <IconButton
             disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
             icon="pause-circle-outline"
             size={30}
-            color={dark ? Colors.blue700 : Colors.blue100}
+            color={Colors.blue100}
             onPress={() => insertBooking('pause')}
           />
         </Surface>
         <Surface
           style={{
-            backgroundColor: dark ? Colors.red200 : Colors.red600,
-            borderColor: dark ? Colors.red600 : Colors.red200,
+            backgroundColor: Colors.red600,
             borderRadius: 100,
-            borderWidth: 1,
           }}
         >
           <IconButton
             disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
             icon="stop-circle-outline"
             size={30}
-            color={dark ? Colors.red700 : Colors.red100}
+            color={Colors.red100}
             onPress={() => insertBooking('end')}
           />
         </Surface>

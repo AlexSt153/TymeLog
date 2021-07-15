@@ -83,6 +83,7 @@ export default function BackgroundLocationTask() {
           accuracy: Location.Accuracy.Balanced,
         });
       };
+
       startLocationTracking();
 
       BackgroundFetch.registerTaskAsync(LOCATION_TASK_NAME, {
