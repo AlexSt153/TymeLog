@@ -54,8 +54,11 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  console.log('HomeScreen');
+
   return (
     <View style={{ flex: 1 }}>
+      <BackgroundLocationTask />
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{
@@ -109,7 +112,6 @@ export default function HomeScreen({ navigation }) {
           />
         </Surface>
       </View>
-      <BackgroundLocationTask />
     </View>
   );
 }
