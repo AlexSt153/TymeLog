@@ -42,11 +42,15 @@ export default function BackgroundLocationTask() {
   const [permission, setPermission] = useState(false);
 
   useEffect(() => {
+    console.log('check if TaskManager is available');
+
     TaskManager.isAvailableAsync().then((tmAvailable) => {
+      console.log('TaskManager is available', tmAvailable);
       setIsAvailable(tmAvailable);
     });
 
     return () => {
+      console.log('Unregister all tasks from TaskManager');
       TaskManager.unregisterAllTasksAsync();
     };
   }, []);
@@ -83,6 +87,7 @@ export default function BackgroundLocationTask() {
           accuracy: Location.Accuracy.Balanced,
         });
       };
+
       startLocationTracking();
 
       BackgroundFetch.registerTaskAsync(LOCATION_TASK_NAME, {

@@ -18,7 +18,7 @@ export const useStore = create(
       setEncryption: (encryption) => set(() => ({ encryption })),
       masterpwd: '',
       setMasterpwd: (masterpwd) => set(() => ({ masterpwd })),
-      cloudSync: false,
+      cloudSync: true,
       setCloudSync: (cloudSync) => set(() => ({ cloudSync })),
       lastBooking: '',
       setLastBooking: (lastBooking) => set(() => ({ lastBooking })),
