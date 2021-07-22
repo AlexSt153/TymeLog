@@ -47,7 +47,7 @@ export default function HomeScreen({ navigation }) {
           },
         ])
           .then(({ row, rowAffected, insertID, lastQuery }) => {
-            console.log('success', row, rowAffected, insertID, lastQuery);
+            console.log('insertBooking success', row, rowAffected, insertID, lastQuery);
           })
           .catch((e) => console.log(e));
       }

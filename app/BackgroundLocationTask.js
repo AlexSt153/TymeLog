@@ -27,7 +27,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
         },
       ])
         .then(({ row, rowAffected, insertID, lastQuery }) => {
-          console.log('success', row, rowAffected, insertID, lastQuery);
+          console.log('background-location-task success', row, rowAffected, insertID, lastQuery);
         })
         .catch((e) => console.log(e));
     }

@@ -1,16 +1,22 @@
 import * as Location from 'expo-location';
 import { cache } from '../cache';
 
-export const getCoordsResultFromCache = ({ coords }) => {
+interface Coords {
+  latitude: number;
+  longitude: number;
+}
+
+export const getCoordsResultFromCache = (coords: Coords) => {
   return new Promise(async (resolve, reject) => {
-    const coordsResult = await cache.get(coords);
+    const coordsJSON = JSON.stringify(coords);
+    const coordsResult = await cache.get(coordsJSON);
 
     if (coordsResult !== undefined) {
-      resolve(coordsResult);
+      resolve(JSON.parse(coordsResult));
     } else {
       Location.reverseGeocodeAsync(coords)
         .then((result) => {
-          cache.set(coords, result[0]);
+          cache.set(coordsJSON, JSON.stringify(result[0]));
           resolve(result[0]);
         })
         .catch((error) => reject(error));
