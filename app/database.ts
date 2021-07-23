@@ -10,7 +10,7 @@ export const createBookingsTable = () => {
     data: 'TEXT',
     encrypted: 'TEXT DEFAULT "false" NOT NULL',
     synced: 'TEXT DEFAULT "false" NOT NULL',
-  }).then(({ row, rowAffected, insertID, lastQuery }) =>
-    console.log('createBookingsTable success', row, rowAffected, insertID, lastQuery)
+  }).then(({ rowAffected, lastQuery }) =>
+    console.log('createBookingsTable success', rowAffected, lastQuery)
   );
 };

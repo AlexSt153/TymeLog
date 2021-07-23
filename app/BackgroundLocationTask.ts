@@ -15,6 +15,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     return BackgroundFetch.Result.Failed;
   }
   if (data) {
+    // @ts-ignore
     const { locations } = data;
     // do something with the locations captured in the background
     console.log(`locations`, locations);
@@ -26,8 +27,8 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
           data: JSON.stringify({ location: locations[0] }),
         },
       ])
-        .then(({ row, rowAffected, insertID, lastQuery }) => {
-          console.log('background-location-task success', row, rowAffected, insertID, lastQuery);
+        .then(({ rowAffected, lastQuery }) => {
+          console.log('background-location-task success', rowAffected, lastQuery);
         })
         .catch((e) => console.log(e));
     }
@@ -37,16 +38,16 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
 });
 
 export default function BackgroundLocationTask() {
-  const [isAvailable, setIsAvailable] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(0);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [permission, setPermission] = useState(false);
+  const [permission, setPermission] = useState('unknown');
 
   useEffect(() => {
     console.log('check if TaskManager is available');
 
     TaskManager.isAvailableAsync().then((tmAvailable) => {
       console.log('TaskManager is available', tmAvailable);
-      setIsAvailable(tmAvailable);
+      setIsAvailable(tmAvailable === true ? 1 : 0);
     });
 
     return () => {

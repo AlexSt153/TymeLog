@@ -106,7 +106,9 @@ export default function History({ lastBooking, refreshHistory }) {
           elevation: 4,
           backgroundColor: lineColor(item.type),
         }}
-      />
+      >
+        <View />
+      </Surface>
     );
   };
 
@@ -153,7 +155,6 @@ export default function History({ lastBooking, refreshHistory }) {
                     marginRight: 10,
                     backgroundColor: backgroundColor(item.type),
                     borderColor: borderColor(item.type),
-                    borderRadius: 100,
                     borderWidth: 1,
                   }}
                 >

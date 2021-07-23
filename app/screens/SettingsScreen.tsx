@@ -9,6 +9,7 @@ import { createBookingsTable } from '../database';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  button: {},
 });
 
 export default function SettingsScreen() {

@@ -12,7 +12,7 @@ export default function HomeScreen({ navigation }) {
   const lastBooking = useStore((state) => state.lastBooking);
   const setLastBooking = useStore((state) => state.setLastBooking);
   const [refreshHistory, setRefreshHistory] = useState(false);
-  const [ForegroundPermission, setForegroundPermission] = useState('');
+  const [ForegroundPermission, setForegroundPermission] = useState({ status: 'unknown' });
 
   Database('tymelog.db');
 
@@ -46,8 +46,8 @@ export default function HomeScreen({ navigation }) {
             data: JSON.stringify({ location }),
           },
         ])
-          .then(({ row, rowAffected, insertID, lastQuery }) => {
-            console.log('insertBooking success', row, rowAffected, insertID, lastQuery);
+          .then(({ rowAffected, lastQuery }) => {
+            console.log('insertBooking success', rowAffected, lastQuery);
           })
           .catch((e) => console.log(e));
       }
