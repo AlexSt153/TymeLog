@@ -5,7 +5,7 @@ import { SUPABASE_KEY, SUPABASE_URL } from '@env';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, { localStorage: AsyncStorage });
 let supabaseUserID = '';
 
-export const signUpUser = (email, password) => {
+export const signUpUser = (email: string, password: string) => {
   return new Promise(async (resolve, reject) => {
     let { user, error } = await supabase.auth.signUp({
       email,
@@ -16,7 +16,7 @@ export const signUpUser = (email, password) => {
   });
 };
 
-export const signInUser = (email, password) => {
+export const signInUser = (email: string, password: string) => {
   return new Promise(async (resolve, reject) => {
     let { user, error } = await supabase.auth.signIn({
       email,

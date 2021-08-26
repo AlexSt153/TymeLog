@@ -3,41 +3,70 @@ import { Platform } from 'react-native';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import { LocationGeofencingEventType } from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
 
 const isWeb = Platform.OS === 'web';
 const LOCATION_TASK_NAME = 'background-location-task';
+const GEOFENCING_TASK_NAME = 'background-geofencing-task';
+let lastDate = new Date();
+let lastTimeStamp = lastDate.getTime();
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-  if (error) {
-    // Error occurred - check `error.message` for more details.
-    console.log(`error`, error);
-    return BackgroundFetch.Result.Failed;
+const startGeofenceTracking = async () => {
+  const location = await Location.getCurrentPositionAsync();
+
+  lastTimeStamp = location.timestamp;
+  const regions = [];
+
+  if (location) {
+    // console.log(`location`, location);
+
+    insert('bookings', [
+      {
+        type: 'background',
+        data: JSON.stringify({ location }),
+      },
+    ])
+      .then(({ rowAffected, lastQuery }) => {
+        console.log('background-location-task success', rowAffected, lastQuery);
+      })
+      .catch((e) => console.log(e));
+
+    regions.push({
+      identifier: 'CurrentPosition',
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      radius: location.coords.speed * 10,
+      notifyOnEntry: false,
+      notifyOnExit: true,
+    });
+
+    await Location.startGeofencingAsync(GEOFENCING_TASK_NAME, regions);
   }
-  if (data) {
-    // @ts-ignore
-    const { locations } = data;
-    // do something with the locations captured in the background
-    console.log(`locations`, locations);
+};
 
-    if (Array.isArray(locations)) {
-      insert('bookings', [
-        {
-          type: 'background',
-          data: JSON.stringify({ location: locations[0] }),
-        },
-      ])
-        .then(({ rowAffected, lastQuery }) => {
-          console.log('background-location-task success', rowAffected, lastQuery);
-        })
-        .catch((e) => console.log(e));
+// @ts-ignore
+TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region }, error }) => {
+  if (error) {
+    // check `error.message` for more details.
+    return;
+  }
+  if (eventType === LocationGeofencingEventType.Enter) {
+    // console.log("You've entered region:", region);
+  } else if (eventType === LocationGeofencingEventType.Exit) {
+    const newDate = new Date();
+    const newTimeStamp = newDate.getTime();
+
+    if (newTimeStamp - lastTimeStamp > 1000) {
+      console.log("You've left region:", region);
+      lastTimeStamp = newTimeStamp;
+      await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+      await startGeofenceTracking();
     }
-
-    return locations ? BackgroundFetch.Result.NewData : BackgroundFetch.Result.NoData;
   }
 });
 
-export default function BackgroundLocationTask() {
+export default function BackgroundLocationTask({ children }) {
   const [isAvailable, setIsAvailable] = useState(0);
   const [isRegistered, setIsRegistered] = useState(false);
   const [permission, setPermission] = useState('unknown');
@@ -83,21 +112,9 @@ export default function BackgroundLocationTask() {
     console.log(`Task ${LOCATION_TASK_NAME} location permission`, permission);
 
     if (permission === 'granted' && !isWeb) {
-      const startLocationTracking = async () => {
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          accuracy: Location.Accuracy.Balanced,
-        });
-      };
-
-      startLocationTracking();
-
-      BackgroundFetch.registerTaskAsync(LOCATION_TASK_NAME, {
-        minimumInterval: 15,
-        stopOnTerminate: false,
-        startOnBoot: true,
-      });
+      startGeofenceTracking();
     }
   }, [permission]);
 
-  return null;
+  return children;
 }

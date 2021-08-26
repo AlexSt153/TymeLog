@@ -171,7 +171,13 @@ export default function History({ lastBooking, refreshHistory }) {
                     {item.type[0].toUpperCase()}
                   </Text>
                 </Surface>
-                <View style={{ flexDirection: 'column', flexWrap: 'wrap' }}>
+                <View
+                  style={{
+                    width: '80%',
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text>{format(data.location.timestamp, 'HH:mm:ss')}</Text>
                     <Text>{format(data.location.timestamp, 'dd.MM.yy')}</Text>

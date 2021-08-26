@@ -17,6 +17,7 @@ import { useStore } from '../store';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import { supabase } from '../../lib/supabase';
+import BackgroundLocationTask from '../core/BackgroundLocationTask';
 
 const CombinedDefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
 const CombinedDarkTheme = merge(PaperDarkTheme, NavigationDarkTheme);
@@ -78,7 +79,11 @@ export default function Navigation() {
     }
 
     if (cloudSync === true && loggedIn === true && session) {
-      return <AppStack />;
+      return (
+        <BackgroundLocationTask>
+          <AppStack />
+        </BackgroundLocationTask>
+      );
     }
 
     if (cloudSync === false && loggedIn === false) {
@@ -86,7 +91,11 @@ export default function Navigation() {
     }
 
     if (cloudSync === false && loggedIn === true) {
-      return <AppStack />;
+      return (
+        <BackgroundLocationTask>
+          <AppStack />
+        </BackgroundLocationTask>
+      );
     }
 
     return null;

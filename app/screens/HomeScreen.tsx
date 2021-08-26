@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { Surface, IconButton, Colors } from 'react-native-paper';
 import Database, { insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
-import BackgroundLocationTask from '../BackgroundLocationTask';
 import { useStore } from '../store';
 import History from '../components/History';
 import { createBookingsTable } from '../database';
@@ -58,7 +57,6 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <BackgroundLocationTask />
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{

@@ -57,7 +57,14 @@ export default function MapScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Title>Map!</Title>
-      <MapView userInterfaceStyle={dark ? 'dark' : 'light'} style={styles.map} showsUserLocation>
+      <MapView
+        onUserLocationChange={() => {
+          getBookingsFromDB();
+        }}
+        userInterfaceStyle={dark ? 'dark' : 'light'}
+        style={styles.map}
+        showsUserLocation
+      >
         {markers.map((marker, index) => (
           <Marker
             key={index}
