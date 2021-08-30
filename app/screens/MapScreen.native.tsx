@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Title } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
 import { search } from 'expo-sqlite-query-helper';
 import { useTheme } from '@react-navigation/native';
@@ -20,6 +19,7 @@ const styles = StyleSheet.create({
 export default function MapScreen({ navigation }) {
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
+  const [region, setRegion] = useState(null);
 
   const { dark } = useTheme();
 
@@ -27,6 +27,17 @@ export default function MapScreen({ navigation }) {
     const result = await search('bookings');
     if (Array.isArray(result.rows._array)) {
       setBookings(result.rows._array);
+
+      const arrayLength = result.rows._array.length;
+      const { data } = result.rows._array[arrayLength - 1];
+      const dataJSON = JSON.parse(data);
+
+      setRegion({
+        latitude: dataJSON.location?.coords?.latitude,
+        latitudeDelta: 0.054351194827738425,
+        longitude: dataJSON.location?.coords?.longitude,
+        longitudeDelta: 0.028632897433652715,
+      });
     }
   };
 
@@ -56,14 +67,15 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Title>Map!</Title>
       <MapView
-        onUserLocationChange={() => {
+        onUserLocationChange={(event) => {
           getBookingsFromDB();
         }}
+        // @ts-ignore
         userInterfaceStyle={dark ? 'dark' : 'light'}
         style={styles.map}
         showsUserLocation
+        initialRegion={region}
       >
         {markers.map((marker, index) => (
           <Marker
