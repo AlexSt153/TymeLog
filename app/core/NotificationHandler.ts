@@ -22,7 +22,18 @@ export default function NotificationHandler({ children }) {
       settings.granted === true ||
       settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
     ) {
-      Notifications.requestPermissionsAsync().then((permission) => {
+      Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+          allowDisplayInCarPlay: true,
+          allowCriticalAlerts: true,
+          provideAppNotificationSettings: true,
+          allowProvisional: true,
+          allowAnnouncements: true,
+        },
+      }).then((permission) => {
         if (permission.granted === false) {
           Alert.alert('Notifications permission denied', JSON.stringify(permission));
         }
@@ -30,7 +41,7 @@ export default function NotificationHandler({ children }) {
         Notifications.setNotificationHandler({
           handleNotification: async () => ({
             shouldShowAlert: true,
-            shouldPlaySound: false,
+            shouldPlaySound: true,
             shouldSetBadge: false,
           }),
         });

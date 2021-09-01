@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { search } from 'expo-sqlite-query-helper';
 import { useTheme } from '@react-navigation/native';
+import { format } from 'date-fns';
 
 const styles = StyleSheet.create({
   container: {
@@ -82,7 +83,7 @@ export default function MapScreen({ navigation }) {
             key={index}
             coordinate={marker.latlng}
             title={marker.title}
-            description={marker.description}
+            description={format(marker.description, 'DD/MM/YYYY HH:mm')}
           />
         ))}
       </MapView>
