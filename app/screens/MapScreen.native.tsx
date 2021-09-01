@@ -30,15 +30,17 @@ export default function MapScreen({ navigation }) {
       setBookings(result.rows._array);
 
       const arrayLength = result.rows._array.length;
-      const { data } = result.rows._array[arrayLength - 1];
-      const dataJSON = JSON.parse(data);
+      if (arrayLength > 0) {
+        const { data } = result.rows._array[arrayLength - 1];
+        const dataJSON = JSON.parse(data);
 
-      setRegion({
-        latitude: dataJSON.location?.coords?.latitude,
-        latitudeDelta: 0.054351194827738425,
-        longitude: dataJSON.location?.coords?.longitude,
-        longitudeDelta: 0.028632897433652715,
-      });
+        setRegion({
+          latitude: dataJSON.location?.coords?.latitude,
+          latitudeDelta: 0.054351194827738425,
+          longitude: dataJSON.location?.coords?.longitude,
+          longitudeDelta: 0.028632897433652715,
+        });
+      }
     }
   };
 
