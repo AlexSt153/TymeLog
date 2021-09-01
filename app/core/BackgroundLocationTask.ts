@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import { LocationGeofencingEventType } from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
+import { presentNotificationAsync } from './NotificationHandler';
 
 const isWeb = Platform.OS === 'web';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
@@ -59,7 +60,8 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
     console.log(lastTimeStamp, newTimeStamp, newTimeStamp - lastTimeStamp > 5000);
 
     if (newTimeStamp - lastTimeStamp > 5000) {
-      console.log("You've left region:", region);
+      presentNotificationAsync({ title: 'You have left the region', body: JSON.stringify(region) });
+
       lastTimeStamp = newTimeStamp;
       await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
       await startGeofenceTracking();
@@ -70,7 +72,7 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
 export default function BackgroundLocationTask({ children }) {
   const [isAvailable, setIsAvailable] = useState(0);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [permission, setPermission] = useState('unknown');
+  const [permission, setPermission] = useState({});
 
   useEffect(() => {
     console.log('check if TaskManager is available');
@@ -80,10 +82,10 @@ export default function BackgroundLocationTask({ children }) {
       setIsAvailable(tmAvailable === true ? 1 : 0);
     });
 
-    return () => {
-      console.log('Unregister all tasks from TaskManager');
-      TaskManager.unregisterAllTasksAsync();
-    };
+    // return () => {
+    //   console.log('Unregister all tasks from TaskManager');
+    //   TaskManager.unregisterAllTasksAsync();
+    // };
   }, []);
 
   useEffect(() => {
@@ -100,9 +102,12 @@ export default function BackgroundLocationTask({ children }) {
     console.log(`Task ${GEOFENCING_TASK_NAME} isRegistered`, isRegistered);
 
     if (isRegistered === false) {
-      const requestPermissionAndStartBackgroundLocationTask = async () => {
-        const { status } = await Location.requestBackgroundPermissionsAsync();
-        setPermission(status);
+      const requestPermissionAndStartBackgroundLocationTask = () => {
+        Location.requestBackgroundPermissionsAsync()
+          .then((permission) => {
+            setPermission(permission);
+          })
+          .catch((err) => Alert.alert('geofencing service error', err.message));
       };
 
       requestPermissionAndStartBackgroundLocationTask();

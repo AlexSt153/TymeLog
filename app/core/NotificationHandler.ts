@@ -1,43 +1,41 @@
-import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
-import { GEOFENCING_TASK_NAME } from './BackgroundLocationTask';
+import { Alert } from 'react-native';
 
 export function presentNotificationAsync({ title, body }) {
   Notifications.scheduleNotificationAsync({
     content: { title, body },
     trigger: null,
+  }).catch((error) => {
+    Alert.alert('presentNotificationAsync', error.message);
   });
 }
 
 export default function NotificationHandler({ children }) {
   Notifications.getPermissionsAsync().then((settings) => {
+    // console.log(`settings`, settings);
+
+    if (settings.canAskAgain === false) {
+      Alert.alert('Notifications permission denied', JSON.stringify(settings));
+    }
+
     if (
-      settings.granted ||
+      settings.granted === true ||
       settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
     ) {
-      //   console.log(`NotificationHandler: Permission granted`);
-      // } else {
-      console.log(`NotificationHandler: Permission denied`);
-
       Notifications.requestPermissionsAsync().then((permission) => {
-        console.log(`permission`, permission);
+        if (permission.granted === false) {
+          Alert.alert('Notifications permission denied', JSON.stringify(permission));
+        }
+
+        Notifications.setNotificationHandler({
+          handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: false,
+            shouldSetBadge: false,
+          }),
+        });
       });
     }
-  });
-
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-
-  Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((geofencingIsEnabled) => {
-    presentNotificationAsync({
-      title: `Geofencing ${geofencingIsEnabled}`,
-      body: "I'm so proud of myself!",
-    });
   });
 
   return children;
