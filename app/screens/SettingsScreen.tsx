@@ -6,6 +6,7 @@ import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
 import { dropTable } from 'expo-sqlite-query-helper';
 import { createBookingsTable } from '../database';
+import { presentNotificationAsync } from '../core/NotificationHandler';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -106,6 +107,14 @@ export default function SettingsScreen() {
           />
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
+          <Button
+            onPress={() => {
+              presentNotificationAsync({ title: 'Test', body: 'Notification' });
+            }}
+            style={styles.button}
+          >
+            Test
+          </Button>
           <Button
             onPress={() => {
               Alert.alert(

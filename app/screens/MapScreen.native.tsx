@@ -85,7 +85,7 @@ export default function MapScreen({ navigation }) {
             key={index}
             coordinate={marker.latlng}
             title={marker.title}
-            description={format(marker.description, 'DD/MM/YYYY HH:mm')}
+            description={marker.description}
           />
         ))}
       </MapView>
