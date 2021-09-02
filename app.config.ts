@@ -51,6 +51,7 @@ module.exports = () => {
         permissions: [
           'READ_EXTERNAL_STORAGE',
           'WRITE_EXTERNAL_STORAGE',
+          'ACCESS_BACKGROUND_LOCATION',
           'ACCESS_COARSE_LOCATION',
           'ACCESS_FINE_LOCATION',
           'FOREGROUND_SERVICE',

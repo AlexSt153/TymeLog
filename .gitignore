@@ -9,6 +9,9 @@ npm-debug.*
 *.orig.*
 web-build/
 
+# sentry tmp
+.tmp
+
 # api keys
 .env
 
