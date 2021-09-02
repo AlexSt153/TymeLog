@@ -48,7 +48,15 @@ module.exports = () => {
           foregroundImage: './assets/adaptive-icon.png',
           backgroundColor: '#002147',
         },
-        permissions: ['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE'],
+        permissions: [
+          'READ_EXTERNAL_STORAGE',
+          'WRITE_EXTERNAL_STORAGE',
+          'ACCESS_COARSE_LOCATION',
+          'ACCESS_FINE_LOCATION',
+          'FOREGROUND_SERVICE',
+          'RECEIVE_BOOT_COMPLETED',
+          'WAKE_LOCK',
+        ],
         package: 'com.alexst15.TymeLog',
       },
       web: {
