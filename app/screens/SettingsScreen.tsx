@@ -90,19 +90,27 @@ export default function SettingsScreen() {
           <List.Item
             title="Secure settings"
             right={() => (
-              <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
+              <Switch
+                disabled
+                value={lockSettings}
+                onValueChange={() => setLockSettings(!lockSettings)}
+              />
             )}
           />
           <List.Item
             title="Encryption"
             right={() => (
-              <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
+              <Switch
+                disabled
+                value={encryption}
+                onValueChange={() => setEncryption(!encryption)}
+              />
             )}
           />
           <List.Item
             title="Cloud Sync"
             right={() => (
-              <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
+              <Switch disabled value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
             )}
           />
         </List.Section>
