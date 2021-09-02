@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const { SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN } = process.env;
+const { SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN, ANDROID_GOOGLE_MAPS_API_KEY } = process.env;
 
 module.exports = () => {
   return {
@@ -58,6 +58,11 @@ module.exports = () => {
           'WAKE_LOCK',
         ],
         package: 'com.alexst15.TymeLog',
+        config: {
+          googleMaps: {
+            apiKey: ANDROID_GOOGLE_MAPS_API_KEY,
+          },
+        },
       },
       web: {
         favicon: './assets/favicon.png',
