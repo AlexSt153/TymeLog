@@ -33,7 +33,7 @@ export const startGeofenceTracking = async () => {
       identifier: 'CurrentPosition',
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-      radius: 4 * (location.coords.speed * location.coords.speed) + 100,
+      radius: 0.5 * location.coords.speed * location.coords.speed + 100,
       notifyOnEntry: false,
       notifyOnExit: true,
     });
@@ -45,21 +45,15 @@ export const startGeofenceTracking = async () => {
 // @ts-ignore
 TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region }, error }) => {
   if (error) {
-    // check `error.message` for more details.
+    console.log('defineTask error background geofencing', error.message);
     return;
   }
-
-  // if (eventType === LocationGeofencingEventType.Enter) {
-  //   console.log("You've entered region:", region);
-  // }
 
   if (eventType === LocationGeofencingEventType.Exit) {
     const newDate = new Date();
     const newTimeStamp = newDate.getTime();
 
-    console.log(lastTimeStamp, newTimeStamp, newTimeStamp - lastTimeStamp > 5000);
-
-    if (newTimeStamp - lastTimeStamp > 5000) {
+    if (newTimeStamp - lastTimeStamp > 1000) {
       presentNotificationAsync({ title: 'You have left the region', body: JSON.stringify(region) });
 
       lastTimeStamp = newTimeStamp;
@@ -81,11 +75,6 @@ export default function BackgroundLocationTask({ children }) {
       console.log('TaskManager is available', tmAvailable);
       setIsAvailable(tmAvailable === true ? 1 : 0);
     });
-
-    // return () => {
-    //   console.log('Unregister all tasks from TaskManager');
-    //   TaskManager.unregisterAllTasksAsync();
-    // };
   }, []);
 
   useEffect(() => {
