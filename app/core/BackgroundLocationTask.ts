@@ -8,6 +8,7 @@ import { presentNotificationAsync } from './NotificationHandler';
 
 const isWeb = Platform.OS === 'web';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
+const geofencingBounceTimeout = Platform.OS === 'android' ? 5000 : 1000;
 let lastDate = new Date();
 let lastTimeStamp = lastDate.getTime();
 
@@ -53,7 +54,7 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
     const newDate = new Date();
     const newTimeStamp = newDate.getTime();
 
-    if (newTimeStamp - lastTimeStamp > 1000) {
+    if (newTimeStamp - lastTimeStamp > geofencingBounceTimeout) {
       presentNotificationAsync({ title: 'You have left the region', body: JSON.stringify(region) });
 
       lastTimeStamp = newTimeStamp;
