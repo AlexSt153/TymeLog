@@ -117,14 +117,6 @@ export default function SettingsScreen() {
         <View style={{ flexDirection: 'row' }}>
           <Button
             onPress={() => {
-              presentNotificationAsync({ title: 'Test', body: 'Notification' });
-            }}
-            style={styles.button}
-          >
-            Test
-          </Button>
-          <Button
-            onPress={() => {
               Alert.alert(
                 'Delete data',
                 'Are you sure you want purge all data from the datebase?',

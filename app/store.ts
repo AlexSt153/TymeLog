@@ -26,6 +26,8 @@ type MainState = {
   setCloudSync: (cloudSync: boolean) => void;
   lastBooking: lastBooking;
   setLastBooking: (lastBooking: lastBooking) => void;
+  regions: Array<object>;
+  setRegions: (regions: Array<object>) => void;
 };
 
 export const useStore = create<MainState>(
@@ -48,6 +50,8 @@ export const useStore = create<MainState>(
       setCloudSync: (cloudSync) => set(() => ({ cloudSync })),
       lastBooking: { type: '', timestamp: 0, data: '' },
       setLastBooking: (lastBooking) => set(() => ({ lastBooking })),
+      regions: [],
+      setRegions: (regions) => set(() => ({ regions })),
     }),
     {
       name: 'main-storage',

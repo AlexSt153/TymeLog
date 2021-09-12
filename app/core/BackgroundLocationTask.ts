@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { LocationGeofencingEventType } from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
 import { presentNotificationAsync } from './NotificationHandler';
+import { useStore } from '../store';
 
 const isWeb = Platform.OS === 'web';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
@@ -13,6 +14,8 @@ let lastDate = new Date();
 let lastTimeStamp = lastDate.getTime();
 
 export const startGeofenceTracking = async () => {
+  const setRegions = useStore.getState().setRegions;
+
   const location = await Location.getCurrentPositionAsync();
 
   lastTimeStamp = location.timestamp;
@@ -30,14 +33,24 @@ export const startGeofenceTracking = async () => {
       })
       .catch((e) => console.log(e));
 
+    let radius = 2 * location.coords.speed * location.coords.speed;
+
+    if (radius < 100) radius = 100;
+    if (radius > 2000) radius = 2000;
+
+    console.log(`radius`, radius);
+
     regions.push({
       identifier: 'CurrentPosition',
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
-      radius: 0.5 * location.coords.speed * location.coords.speed + 100,
+      radius: radius,
       notifyOnEntry: false,
       notifyOnExit: true,
     });
+
+    setRegions(regions);
+    presentNotificationAsync({ title: 'New regions', body: JSON.stringify(regions) });
 
     await Location.startGeofencingAsync(GEOFENCING_TASK_NAME, regions);
   }
@@ -97,7 +110,7 @@ export default function BackgroundLocationTask({ children }) {
           .then((permission) => {
             setPermission(permission);
           })
-          .catch((err) => Alert.alert('geofencing service error', err.message));
+          .catch((err) => console.log('geofencing service error', err.message));
       };
 
       requestPermissionAndStartBackgroundLocationTask();

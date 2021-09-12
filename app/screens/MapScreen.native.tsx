@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Circle } from 'react-native-maps';
 import { search } from 'expo-sqlite-query-helper';
 import { useTheme } from '@react-navigation/native';
 import { format } from 'date-fns';
+import { useStore } from '../store';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,6 +22,9 @@ export default function MapScreen({ navigation }) {
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [region, setRegion] = useState(null);
+  const regions = useStore((state) => state.regions);
+
+  // console.log('regions', regions);
 
   const { dark } = useTheme();
 
@@ -86,6 +90,15 @@ export default function MapScreen({ navigation }) {
             coordinate={marker.latlng}
             title={marker.title}
             description={marker.description}
+          />
+        ))}
+        {regions.map((region, index) => (
+          <Circle
+            key={index}
+            center={{ latitude: region.latitude, longitude: region.longitude }}
+            radius={region.radius}
+            strokeColor="rgba(0,0,255,0.5)"
+            fillColor="rgba(0,0,255,0.5)"
           />
         ))}
       </MapView>
