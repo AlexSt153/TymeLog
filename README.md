@@ -1,5 +1,8 @@
 # TymeLog - work in progress
 
+I'm developing this app only for fun in my freetime.  
+Don't expect any fast progress with the mentioned features.
+
 ## Roadmap
 
 - Keep track of working hours
