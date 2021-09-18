@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
-import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, View, StyleSheet, Alert } from 'react-native';
 import { Button, List, Switch } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
@@ -8,6 +8,7 @@ import { dropTable } from 'expo-sqlite-query-helper';
 import { createBookingsTable } from '../database';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
+import { GEOFENCING_TASK_NAME } from '../core/BackgroundLocationTask';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -35,6 +36,7 @@ export default function SettingsScreen() {
     granted: false,
   });
   const [hasNotificationPermission, setHasNotificationPermission] = useState({ granted: false });
+  const [hasGeofencingStarted, setHasGeofencingStarted] = useState(false);
 
   useEffect(() => {
     Location.getForegroundPermissionsAsync().then((permissions) => {
@@ -48,11 +50,15 @@ export default function SettingsScreen() {
     Notifications.getPermissionsAsync().then((permissions) => {
       setHasNotificationPermission(permissions);
     });
+
+    Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
+      setHasGeofencingStarted(started);
+    });
   }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <List.Section style={{ width: '100%' }}>
           <List.Subheader>THEME</List.Subheader>
           <List.Item
@@ -177,6 +183,20 @@ export default function SettingsScreen() {
               />
             )}
           />
+          <List.Subheader>LOCATION</List.Subheader>
+          <List.Item
+            title="Geofencing"
+            right={() => (
+              <View
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor: hasGeofencingStarted ? 'green' : 'red',
+                  },
+                ]}
+              />
+            )}
+          />
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
           <Button
@@ -233,7 +253,7 @@ export default function SettingsScreen() {
             Logout
           </Button>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

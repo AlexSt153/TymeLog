@@ -4,17 +4,21 @@ import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import { LocationGeofencingEventType } from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
-import { presentNotificationAsync } from './NotificationHandler';
+// import { presentNotificationAsync } from './NotificationHandler';
 import { useStore } from '../store';
 
 const isWeb = Platform.OS === 'web';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
+const geofencingBounceTimeout = Platform.OS === 'android' ? 5000 : 1000;
+let lastDate = new Date();
+let lastTimeStamp = lastDate.getTime();
 
 export const startGeofenceTracking = async () => {
   const setRegions = useStore.getState().setRegions;
 
   const location = await Location.getCurrentPositionAsync();
 
+  lastTimeStamp = location.timestamp;
   const regions = [];
 
   if (location) {
@@ -46,7 +50,7 @@ export const startGeofenceTracking = async () => {
     });
 
     setRegions(regions);
-    presentNotificationAsync({ title: 'New regions', body: JSON.stringify(regions) });
+    // presentNotificationAsync({ title: 'New regions', body: JSON.stringify(regions) });
 
     await Location.startGeofencingAsync(GEOFENCING_TASK_NAME, regions);
   }
@@ -60,10 +64,16 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
   }
 
   if (eventType === LocationGeofencingEventType.Exit) {
-    presentNotificationAsync({ title: 'You have left the region', body: JSON.stringify(region) });
+    const newDate = new Date();
+    const newTimeStamp = newDate.getTime();
 
-    await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
-    await startGeofenceTracking();
+    if (newTimeStamp - lastTimeStamp > geofencingBounceTimeout) {
+      // presentNotificationAsync({ title: 'You have left the region', body: JSON.stringify(region) });
+
+      lastTimeStamp = newTimeStamp;
+      await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
+      await startGeofenceTracking();
+    }
   }
 });
 
