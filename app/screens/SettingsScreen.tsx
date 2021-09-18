@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, View, StyleSheet, Alert } from 'react-native';
 import { Button, List, Switch } from 'react-native-paper';
@@ -6,10 +6,12 @@ import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
 import { dropTable } from 'expo-sqlite-query-helper';
 import { createBookingsTable } from '../database';
-import { presentNotificationAsync } from '../core/NotificationHandler';
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  indicator: { height: 30, width: 30, borderRadius: 15 },
   button: {},
 });
 
@@ -25,6 +27,28 @@ export default function SettingsScreen() {
   const setEncryption = useStore((state) => state.setEncryption);
   const cloudSync = useStore((state) => state.cloudSync);
   const setCloudSync = useStore((state) => state.setCloudSync);
+
+  const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState({
+    granted: false,
+  });
+  const [hasBackgroundLocationPermission, setHasBackgroundLocationPermission] = useState({
+    granted: false,
+  });
+  const [hasNotificationPermission, setHasNotificationPermission] = useState({ granted: false });
+
+  useEffect(() => {
+    Location.getForegroundPermissionsAsync().then((permissions) => {
+      setHasForegroundLocationPermission(permissions);
+    });
+
+    Location.getBackgroundPermissionsAsync().then((permissions) => {
+      setHasBackgroundLocationPermission(permissions);
+    });
+
+    Notifications.getPermissionsAsync().then((permissions) => {
+      setHasNotificationPermission(permissions);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
@@ -111,6 +135,46 @@ export default function SettingsScreen() {
             title="Cloud Sync"
             right={() => (
               <Switch disabled value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
+            )}
+          />
+          <List.Subheader>PERMISSIONS</List.Subheader>
+          <List.Item
+            title="Foreground Location"
+            right={() => (
+              <View
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor: hasForegroundLocationPermission.granted ? 'green' : 'red',
+                  },
+                ]}
+              />
+            )}
+          />
+          <List.Item
+            title="Background Location"
+            right={() => (
+              <View
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor: hasBackgroundLocationPermission.granted ? 'green' : 'red',
+                  },
+                ]}
+              />
+            )}
+          />
+          <List.Item
+            title="Notifications"
+            right={() => (
+              <View
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor: hasNotificationPermission.granted ? 'green' : 'red',
+                  },
+                ]}
+              />
             )}
           />
         </List.Section>
