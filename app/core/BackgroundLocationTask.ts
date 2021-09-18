@@ -8,6 +8,7 @@ import { insert } from 'expo-sqlite-query-helper';
 import { useStore } from '../store';
 
 const isWeb = Platform.OS === 'web';
+export const BACKGROUND_LOCATION_TASK_NAME = 'background-location-task';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
 const geofencingBounceTimeout = Platform.OS === 'android' ? 5000 : 1000;
 let lastDate = new Date();
@@ -33,10 +34,10 @@ export const startGeofenceTracking = async () => {
       })
       .catch((e) => console.log(e));
 
-    let radius = 2 * location.coords.speed * location.coords.speed;
+    let radius = location.coords.speed * location.coords.speed;
 
     if (radius < 100) radius = 100;
-    if (radius > 2000) radius = 2000;
+    if (radius > 1000) radius = 1000;
 
     console.log(`radius`, radius);
 
@@ -72,8 +73,34 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
 
       lastTimeStamp = newTimeStamp;
       await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
-      await startGeofenceTracking();
+      // await startGeofenceTracking();
     }
+  }
+});
+
+export const startBackgroundLocationTask = async () => {
+  Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME);
+};
+
+TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
+  if (error) {
+    // check `error.message` for more details.
+    console.log(`error`, error);
+    return;
+  }
+  console.log('Received new locations', locations);
+
+  if (Array.isArray(locations)) {
+    insert('bookings', [
+      {
+        type: 'background',
+        data: JSON.stringify({ location: locations[0] }),
+      },
+    ])
+      .then(({ rowAffected, lastQuery }) => {
+        console.log('background-location-task success', rowAffected, lastQuery);
+      })
+      .catch((e) => console.log(e));
   }
 });
 
@@ -121,7 +148,8 @@ export default function BackgroundLocationTask({ children }) {
     console.log(`Task ${GEOFENCING_TASK_NAME} location permission`, permission);
 
     if (permission === 'granted' && !isWeb) {
-      startGeofenceTracking();
+      // startGeofenceTracking();
+      startBackgroundLocationTask();
     }
   }, [permission]);
 

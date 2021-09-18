@@ -8,7 +8,10 @@ import { dropTable } from 'expo-sqlite-query-helper';
 import { createBookingsTable } from '../database';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
-import { GEOFENCING_TASK_NAME } from '../core/BackgroundLocationTask';
+import {
+  BACKGROUND_LOCATION_TASK_NAME,
+  GEOFENCING_TASK_NAME,
+} from '../core/BackgroundLocationTask';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -16,7 +19,7 @@ const styles = StyleSheet.create({
   button: {},
 });
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const { dark } = useTheme();
 
   const logOut = useStore((state) => state.logOut);
@@ -37,24 +40,33 @@ export default function SettingsScreen() {
   });
   const [hasNotificationPermission, setHasNotificationPermission] = useState({ granted: false });
   const [hasGeofencingStarted, setHasGeofencingStarted] = useState(false);
+  const [hasBackgroundLocationUpdates, setHasBackgroundLocationUpdates] = useState(false);
 
   useEffect(() => {
-    Location.getForegroundPermissionsAsync().then((permissions) => {
-      setHasForegroundLocationPermission(permissions);
+    const unsubscribe = navigation.addListener('focus', () => {
+      Location.getForegroundPermissionsAsync().then((permissions) => {
+        setHasForegroundLocationPermission(permissions);
+      });
+
+      Location.getBackgroundPermissionsAsync().then((permissions) => {
+        setHasBackgroundLocationPermission(permissions);
+      });
+
+      Notifications.getPermissionsAsync().then((permissions) => {
+        setHasNotificationPermission(permissions);
+      });
+
+      Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
+        setHasGeofencingStarted(started);
+      });
+
+      Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
+        setHasBackgroundLocationUpdates(started);
+      });
     });
 
-    Location.getBackgroundPermissionsAsync().then((permissions) => {
-      setHasBackgroundLocationPermission(permissions);
-    });
-
-    Notifications.getPermissionsAsync().then((permissions) => {
-      setHasNotificationPermission(permissions);
-    });
-
-    Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
-      setHasGeofencingStarted(started);
-    });
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
@@ -192,6 +204,19 @@ export default function SettingsScreen() {
                   styles.indicator,
                   {
                     backgroundColor: hasGeofencingStarted ? 'green' : 'red',
+                  },
+                ]}
+              />
+            )}
+          />
+          <List.Item
+            title="Background Updates"
+            right={() => (
+              <View
+                style={[
+                  styles.indicator,
+                  {
+                    backgroundColor: hasBackgroundLocationUpdates ? 'green' : 'red',
                   },
                 ]}
               />

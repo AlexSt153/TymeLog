@@ -3,7 +3,12 @@ import { useEffect } from 'react';
 import { AppState } from 'react-native';
 import * as Location from 'expo-location';
 import { useStore } from '../store';
-import { startGeofenceTracking, GEOFENCING_TASK_NAME } from './BackgroundLocationTask';
+import {
+  // startGeofenceTracking,
+  startBackgroundLocationTask,
+  BACKGROUND_LOCATION_TASK_NAME,
+  GEOFENCING_TASK_NAME,
+} from './BackgroundLocationTask';
 
 export default function BackgroundTasks({ children }) {
   const cloudSync = useStore((state) => state.cloudSync);
@@ -19,10 +24,17 @@ export default function BackgroundTasks({ children }) {
 
   const handleAppStateChange = async (nextAppState) => {
     const geofencingIsEnabled = await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
-
     console.log(`geofencingIsEnabled`, geofencingIsEnabled);
     if (geofencingIsEnabled === false) {
-      await startGeofenceTracking();
+      // await startGeofenceTracking();
+    }
+
+    const backgroundLocationTaskIsEnabled = await Location.hasStartedLocationUpdatesAsync(
+      BACKGROUND_LOCATION_TASK_NAME
+    );
+    console.log(`backgroundLocationTaskIsEnabled`, backgroundLocationTaskIsEnabled);
+    if (backgroundLocationTaskIsEnabled === false) {
+      await startBackgroundLocationTask();
     }
 
     if (nextAppState === 'active' && cloudSync === true && loggedIn === true && session) {
