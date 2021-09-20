@@ -2,6 +2,8 @@ import { search } from 'expo-sqlite-query-helper';
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
 import * as Location from 'expo-location';
+// import * as TaskManager from 'expo-task-manager';
+
 import { useStore } from '../store';
 import {
   // startGeofenceTracking,
@@ -45,6 +47,8 @@ export default function BackgroundTasks({ children }) {
 
   useEffect(() => {
     AppState.addEventListener('change', handleAppStateChange);
+
+    // TaskManager.unregisterAllTasksAsync();
 
     return () => {
       AppState.removeEventListener('change', handleAppStateChange);

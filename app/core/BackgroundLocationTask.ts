@@ -79,7 +79,12 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
 });
 
 export const startBackgroundLocationTask = async () => {
-  Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME);
+  Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
+    deferredUpdatesInterval: 60 * 1000,
+    deferredUpdatesDistance: 100,
+    pausesUpdatesAutomatically: true,
+    activityType: Location.ActivityType.AutomotiveNavigation,
+  });
 };
 
 TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
@@ -91,10 +96,15 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, er
   console.log('Received new locations', locations);
 
   if (Array.isArray(locations)) {
+    // presentNotificationAsync({
+    //   title: 'Received new locations',
+    //   body: JSON.stringify(locations[locations.length - 1]),
+    // });
+
     insert('bookings', [
       {
         type: 'background',
-        data: JSON.stringify({ location: locations[0] }),
+        data: JSON.stringify({ location: locations[locations.length - 1] }),
       },
     ])
       .then(({ rowAffected, lastQuery }) => {
