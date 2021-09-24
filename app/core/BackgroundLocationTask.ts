@@ -4,7 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import { LocationGeofencingEventType } from 'expo-location';
 import { insert } from 'expo-sqlite-query-helper';
-import { presentNotificationAsync } from './NotificationHandler';
+// import { presentNotificationAsync } from './NotificationHandler';
 import { useStore } from '../store';
 
 const isWeb = Platform.OS === 'web';
@@ -101,8 +101,7 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
 export const startBackgroundLocationTask = async () => {
   Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
     pausesUpdatesAutomatically: true,
-    deferredUpdatesDistance: 100,
-    deferredUpdatesInterval: 60 * 1000,
+    deferredUpdatesInterval: 5 * 60 * 1000,
   });
 };
 
@@ -122,13 +121,13 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, er
         locations[locations.length - 1].coords.longitude
       );
 
-      if (distance > 100) {
+      if (distance >= 100) {
         lastLocation = locations[locations.length - 1];
 
-        presentNotificationAsync({
-          title: 'Received new locations',
-          body: JSON.stringify(locations[locations.length - 1]),
-        });
+        // presentNotificationAsync({
+        //   title: 'Received new locations',
+        //   body: JSON.stringify(locations[locations.length - 1]),
+        // });
 
         insert('bookings', [
           {

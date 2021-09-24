@@ -72,89 +72,6 @@ export default function SettingsScreen({ navigation }) {
     <SafeAreaView style={{ flex: 1, margin: 20 }}>
       <ScrollView contentContainerStyle={styles.container}>
         <List.Section style={{ width: '100%' }}>
-          <List.Subheader>THEME</List.Subheader>
-          <List.Item
-            title="Use System Light/Dark Mode"
-            right={() => (
-              <Switch
-                value={theme === 'system'}
-                onValueChange={() => {
-                  switch (theme) {
-                    case 'system':
-                      setTheme(dark ? 'dark' : 'light');
-
-                      break;
-                    default:
-                      setTheme('system');
-                  }
-                }}
-              />
-            )}
-          />
-          <AnimatePresence>
-            {theme !== 'system' && (
-              <MotiView
-                from={{ height: 0 }}
-                animate={{ height: 100 }}
-                exit={{ height: 0 }}
-                transition={{
-                  type: 'timing',
-                  duration: 350,
-                }}
-                style={{ overflow: 'hidden' }}
-              >
-                <List.Item
-                  title="Light Theme"
-                  right={() => (
-                    <Switch
-                      value={theme === 'light'}
-                      onValueChange={(lightSwitchValue) =>
-                        setTheme(lightSwitchValue ? 'light' : 'dark')
-                      }
-                    />
-                  )}
-                />
-                <List.Item
-                  title="Dark Theme"
-                  right={() => (
-                    <Switch
-                      value={theme === 'dark'}
-                      onValueChange={(darkSwitchValue) =>
-                        setTheme(darkSwitchValue ? 'dark' : 'light')
-                      }
-                    />
-                  )}
-                />
-              </MotiView>
-            )}
-          </AnimatePresence>
-          <List.Subheader>GENERAL</List.Subheader>
-          <List.Item
-            title="Secure settings"
-            right={() => (
-              <Switch
-                disabled
-                value={lockSettings}
-                onValueChange={() => setLockSettings(!lockSettings)}
-              />
-            )}
-          />
-          <List.Item
-            title="Encryption"
-            right={() => (
-              <Switch
-                disabled
-                value={encryption}
-                onValueChange={() => setEncryption(!encryption)}
-              />
-            )}
-          />
-          <List.Item
-            title="Cloud Sync"
-            right={() => (
-              <Switch disabled value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
-            )}
-          />
           <List.Subheader>PERMISSIONS</List.Subheader>
           <List.Item
             title="Foreground Location"
@@ -222,12 +139,88 @@ export default function SettingsScreen({ navigation }) {
               />
             )}
           />
+          <List.Subheader>THEME</List.Subheader>
+          <List.Item
+            title="Use System Light/Dark Mode"
+            right={() => (
+              <Switch
+                value={theme === 'system'}
+                onValueChange={() => {
+                  switch (theme) {
+                    case 'system':
+                      setTheme(dark ? 'dark' : 'light');
+
+                      break;
+                    default:
+                      setTheme('system');
+                  }
+                }}
+              />
+            )}
+          />
+          <AnimatePresence>
+            {theme !== 'system' && (
+              <MotiView
+                from={{ height: 0 }}
+                animate={{ height: 100 }}
+                exit={{ height: 0 }}
+                transition={{
+                  type: 'timing',
+                  duration: 350,
+                }}
+                style={{ overflow: 'hidden' }}
+              >
+                <List.Item
+                  title="Light Theme"
+                  right={() => (
+                    <Switch
+                      value={theme === 'light'}
+                      onValueChange={(lightSwitchValue) =>
+                        setTheme(lightSwitchValue ? 'light' : 'dark')
+                      }
+                    />
+                  )}
+                />
+                <List.Item
+                  title="Dark Theme"
+                  right={() => (
+                    <Switch
+                      value={theme === 'dark'}
+                      onValueChange={(darkSwitchValue) =>
+                        setTheme(darkSwitchValue ? 'dark' : 'light')
+                      }
+                    />
+                  )}
+                />
+              </MotiView>
+            )}
+          </AnimatePresence>
+
+          <List.Subheader>GENERAL</List.Subheader>
+          <List.Item
+            title="Secure settings"
+            right={() => (
+              <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
+            )}
+          />
+          <List.Item
+            title="Encryption"
+            right={() => (
+              <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
+            )}
+          />
+          <List.Item
+            title="Cloud Sync"
+            right={() => (
+              <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
+            )}
+          />
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
           <Button
             onPress={() => {
               Alert.alert(
-                'Delete data',
+                'Delete local data',
                 'Are you sure you want purge all data from the datebase?',
                 [
                   {
