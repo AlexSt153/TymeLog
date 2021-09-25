@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { Surface, IconButton, Colors } from 'react-native-paper';
+import { SafeAreaView, View, useWindowDimensions } from 'react-native';
+import { Surface, IconButton, Colors, Card, Text } from 'react-native-paper';
 import Database, { insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import { useStore } from '../store';
 import History from '../components/History';
 import { createBookingsTable } from '../database';
+import { he } from 'date-fns/locale';
 
 export default function HomeScreen({ navigation }) {
   const lastBooking = useStore((state) => state.lastBooking);
   const setLastBooking = useStore((state) => state.setLastBooking);
   const [refreshHistory, setRefreshHistory] = useState(false);
   const [ForegroundPermission, setForegroundPermission] = useState({ status: 'unknown' });
+
+  const { width, height } = useWindowDimensions();
 
   Database('tymelog.db');
 
@@ -56,7 +59,18 @@ export default function HomeScreen({ navigation }) {
   console.log('HomeScreen');
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Card
+        style={{
+          height: height * 0.2,
+          marginTop: 15,
+          marginHorizontal: 15,
+          padding: height * 0.08,
+          alignItems: 'center',
+        }}
+      >
+        <Text>Charts maybe?</Text>
+      </Card>
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{
@@ -110,6 +124,6 @@ export default function HomeScreen({ navigation }) {
           />
         </Surface>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

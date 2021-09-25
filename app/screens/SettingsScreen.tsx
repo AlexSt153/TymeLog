@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, ScrollView, View, StyleSheet, Alert } from 'react-native';
-import { Button, List, Switch } from 'react-native-paper';
+import { Button, List, Switch, Card } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
 import { dropTable } from 'expo-sqlite-query-helper';
@@ -14,9 +14,15 @@ import {
 } from '../core/BackgroundLocationTask';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 20,
+    paddingBottom: 40,
+  },
   indicator: { height: 30, width: 30, borderRadius: 15 },
   button: {},
+  card: { paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5 },
 });
 
 export default function SettingsScreen({ navigation }) {
@@ -69,152 +75,159 @@ export default function SettingsScreen({ navigation }) {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={{ flex: 1, margin: 20 }}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
         <List.Section style={{ width: '100%' }}>
-          <List.Subheader>PERMISSIONS</List.Subheader>
-          <List.Item
-            title="Foreground Location"
-            right={() => (
-              <View
-                style={[
-                  styles.indicator,
-                  {
-                    backgroundColor: hasForegroundLocationPermission.granted ? 'green' : 'red',
-                  },
-                ]}
-              />
-            )}
-          />
-          <List.Item
-            title="Background Location"
-            right={() => (
-              <View
-                style={[
-                  styles.indicator,
-                  {
-                    backgroundColor: hasBackgroundLocationPermission.granted ? 'green' : 'red',
-                  },
-                ]}
-              />
-            )}
-          />
-          <List.Item
-            title="Notifications"
-            right={() => (
-              <View
-                style={[
-                  styles.indicator,
-                  {
-                    backgroundColor: hasNotificationPermission.granted ? 'green' : 'red',
-                  },
-                ]}
-              />
-            )}
-          />
-          <List.Subheader>LOCATION</List.Subheader>
-          <List.Item
-            title="Geofencing"
-            right={() => (
-              <View
-                style={[
-                  styles.indicator,
-                  {
-                    backgroundColor: hasGeofencingStarted ? 'green' : 'red',
-                  },
-                ]}
-              />
-            )}
-          />
-          <List.Item
-            title="Background Updates"
-            right={() => (
-              <View
-                style={[
-                  styles.indicator,
-                  {
-                    backgroundColor: hasBackgroundLocationUpdates ? 'green' : 'red',
-                  },
-                ]}
-              />
-            )}
-          />
-          <List.Subheader>THEME</List.Subheader>
-          <List.Item
-            title="Use System Light/Dark Mode"
-            right={() => (
-              <Switch
-                value={theme === 'system'}
-                onValueChange={() => {
-                  switch (theme) {
-                    case 'system':
-                      setTheme(dark ? 'dark' : 'light');
-
-                      break;
-                    default:
-                      setTheme('system');
-                  }
-                }}
-              />
-            )}
-          />
-          <AnimatePresence>
-            {theme !== 'system' && (
-              <MotiView
-                from={{ height: 0 }}
-                animate={{ height: 100 }}
-                exit={{ height: 0 }}
-                transition={{
-                  type: 'timing',
-                  duration: 350,
-                }}
-                style={{ overflow: 'hidden' }}
-              >
-                <List.Item
-                  title="Light Theme"
-                  right={() => (
-                    <Switch
-                      value={theme === 'light'}
-                      onValueChange={(lightSwitchValue) =>
-                        setTheme(lightSwitchValue ? 'light' : 'dark')
-                      }
-                    />
-                  )}
+          <Card style={styles.card}>
+            <List.Subheader>PERMISSIONS</List.Subheader>
+            <List.Item
+              title="Foreground Location"
+              right={() => (
+                <View
+                  style={[
+                    styles.indicator,
+                    {
+                      backgroundColor: hasForegroundLocationPermission.granted ? 'green' : 'red',
+                    },
+                  ]}
                 />
-                <List.Item
-                  title="Dark Theme"
-                  right={() => (
-                    <Switch
-                      value={theme === 'dark'}
-                      onValueChange={(darkSwitchValue) =>
-                        setTheme(darkSwitchValue ? 'dark' : 'light')
-                      }
-                    />
-                  )}
+              )}
+            />
+            <List.Item
+              title="Background Location"
+              right={() => (
+                <View
+                  style={[
+                    styles.indicator,
+                    {
+                      backgroundColor: hasBackgroundLocationPermission.granted ? 'green' : 'red',
+                    },
+                  ]}
                 />
-              </MotiView>
-            )}
-          </AnimatePresence>
+              )}
+            />
+            <List.Item
+              title="Notifications"
+              right={() => (
+                <View
+                  style={[
+                    styles.indicator,
+                    {
+                      backgroundColor: hasNotificationPermission.granted ? 'green' : 'red',
+                    },
+                  ]}
+                />
+              )}
+            />
+          </Card>
+          <Card style={styles.card}>
+            <List.Subheader>LOCATION</List.Subheader>
+            <List.Item
+              title="Geofencing"
+              right={() => (
+                <View
+                  style={[
+                    styles.indicator,
+                    {
+                      backgroundColor: hasGeofencingStarted ? 'green' : 'red',
+                    },
+                  ]}
+                />
+              )}
+            />
+            <List.Item
+              title="Background Updates"
+              right={() => (
+                <View
+                  style={[
+                    styles.indicator,
+                    {
+                      backgroundColor: hasBackgroundLocationUpdates ? 'green' : 'red',
+                    },
+                  ]}
+                />
+              )}
+            />
+          </Card>
+          <Card style={styles.card}>
+            <List.Subheader>THEME</List.Subheader>
+            <List.Item
+              title="Use System Light/Dark Mode"
+              right={() => (
+                <Switch
+                  value={theme === 'system'}
+                  onValueChange={() => {
+                    switch (theme) {
+                      case 'system':
+                        setTheme(dark ? 'dark' : 'light');
 
-          <List.Subheader>GENERAL</List.Subheader>
-          <List.Item
-            title="Secure settings"
-            right={() => (
-              <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
-            )}
-          />
-          <List.Item
-            title="Encryption"
-            right={() => (
-              <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
-            )}
-          />
-          <List.Item
-            title="Cloud Sync"
-            right={() => (
-              <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
-            )}
-          />
+                        break;
+                      default:
+                        setTheme('system');
+                    }
+                  }}
+                />
+              )}
+            />
+            <AnimatePresence>
+              {theme !== 'system' && (
+                <MotiView
+                  from={{ height: 0 }}
+                  animate={{ height: 100 }}
+                  exit={{ height: 0 }}
+                  transition={{
+                    type: 'timing',
+                    duration: 350,
+                  }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <List.Item
+                    title="Light Theme"
+                    right={() => (
+                      <Switch
+                        value={theme === 'light'}
+                        onValueChange={(lightSwitchValue) =>
+                          setTheme(lightSwitchValue ? 'light' : 'dark')
+                        }
+                      />
+                    )}
+                  />
+                  <List.Item
+                    title="Dark Theme"
+                    right={() => (
+                      <Switch
+                        value={theme === 'dark'}
+                        onValueChange={(darkSwitchValue) =>
+                          setTheme(darkSwitchValue ? 'dark' : 'light')
+                        }
+                      />
+                    )}
+                  />
+                </MotiView>
+              )}
+            </AnimatePresence>
+          </Card>
+          <Card style={styles.card}>
+            <List.Subheader>GENERAL</List.Subheader>
+            <List.Item
+              title="Secure settings"
+              right={() => (
+                <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
+              )}
+            />
+            <List.Item
+              title="Encryption"
+              right={() => (
+                <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
+              )}
+            />
+            <List.Item
+              title="Cloud Sync"
+              right={() => (
+                <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
+              )}
+            />
+          </Card>
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
           <Button

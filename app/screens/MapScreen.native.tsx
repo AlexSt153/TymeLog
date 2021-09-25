@@ -30,8 +30,8 @@ export default function MapScreen({ navigation }) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
 
-  const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
-  const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
+  const [startDateText, setStartDateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
+  const [endDateText, setEndDateText] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
 
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
@@ -56,7 +56,7 @@ export default function MapScreen({ navigation }) {
   );
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['20%', '50%', '90%'], []);
+  const snapPoints = useMemo(() => ['10%', '90%'], []);
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
@@ -65,7 +65,7 @@ export default function MapScreen({ navigation }) {
     // const result = await search('bookings', { timestamp: { $gt: 0 } });
 
     const result = await executeSql(
-      `SELECT * FROM bookings WHERE timestamp BETWEEN '${startDate}' AND '${endDate}'`
+      `SELECT * FROM bookings WHERE timestamp BETWEEN '${startDateText}' AND '${endDateText}'`
     );
 
     console.log('result :>> ', result);
@@ -112,6 +112,13 @@ export default function MapScreen({ navigation }) {
     setMarkers(bookingMarkers);
   }, [bookings]);
 
+  useEffect(() => {
+    if (date) {
+      setStartDateText(format(date, 'yyyy-MM-dd 00:00:00'));
+      setEndDateText(format(date, 'yyyy-MM-dd 23:59:59'));
+    }
+  }, [date]);
+
   return (
     <View style={styles.container}>
       <MapView
@@ -153,24 +160,14 @@ export default function MapScreen({ navigation }) {
         backgroundStyle={{ backgroundColor: colors.background }}
       >
         <View style={styles.contentContainer}>
-          <Button onPress={() => setOpen(true)} uppercase={false} mode="outlined">
-            Pick single date
-          </Button>
+          <Text onPress={() => setOpen(true)}>{startDateText}</Text>
+          <Text onPress={() => setOpen(true)}>{endDateText}</Text>
           <DatePickerModal
-            // locale={'en'} optional, default: automatic
             mode="single"
             visible={open}
             onDismiss={onDismissSingle}
             date={date}
             onConfirm={onConfirmSingle}
-            // validRange={{
-            //   startDate: new Date(2021, 1, 2),  // optional
-            //   endDate: new Date(), // optional
-            // }}
-            // onChange={} // same props as onConfirm but triggered without confirmed by user
-            // saveLabel="Save" // optional
-            // label="Select date" // optional
-            // animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
           />
         </View>
       </BottomSheet>
