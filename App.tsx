@@ -16,7 +16,7 @@ Sentry.init({
 
 export default function App() {
   useEffect(() => {
-    initialiseOtaManager({});
+    if (!__DEV__) initialiseOtaManager({});
   }, []);
 
   return (

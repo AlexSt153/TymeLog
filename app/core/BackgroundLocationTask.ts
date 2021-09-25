@@ -8,10 +8,31 @@ import { insert } from 'expo-sqlite-query-helper';
 import { useStore } from '../store';
 
 const isWeb = Platform.OS === 'web';
+export const BACKGROUND_LOCATION_TASK_NAME = 'background-location-task';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
 const geofencingBounceTimeout = Platform.OS === 'android' ? 5000 : 1000;
 let lastDate = new Date();
 let lastTimeStamp = lastDate.getTime();
+let lastLocation = null;
+
+function calcCrow(lat1: number, lon1: number, lat2: number, lon2: number) {
+  var R = 6371000; // m
+  var dLat = toRad(lat2 - lat1);
+  var dLon = toRad(lon2 - lon1);
+  var lat1 = toRad(lat1);
+  var lat2 = toRad(lat2);
+
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  return d;
+}
+
+function toRad(Value: number) {
+  return (Value * Math.PI) / 180;
+}
 
 export const startGeofenceTracking = async () => {
   const setRegions = useStore.getState().setRegions;
@@ -33,10 +54,10 @@ export const startGeofenceTracking = async () => {
       })
       .catch((e) => console.log(e));
 
-    let radius = 2 * location.coords.speed * location.coords.speed;
+    let radius = location.coords.speed * location.coords.speed;
 
     if (radius < 100) radius = 100;
-    if (radius > 2000) radius = 2000;
+    if (radius > 1000) radius = 1000;
 
     console.log(`radius`, radius);
 
@@ -72,7 +93,51 @@ TaskManager.defineTask(GEOFENCING_TASK_NAME, async ({ data: { eventType, region 
 
       lastTimeStamp = newTimeStamp;
       await Location.stopGeofencingAsync(GEOFENCING_TASK_NAME);
-      await startGeofenceTracking();
+      // await startGeofenceTracking();
+    }
+  }
+});
+
+export const startBackgroundLocationTask = async () => {
+  Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME, {
+    pausesUpdatesAutomatically: true,
+    deferredUpdatesInterval: 5 * 60 * 1000,
+  });
+};
+
+// @ts-ignore
+TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
+  if (error) {
+    console.log(`error`, error);
+    return;
+  }
+
+  if (Array.isArray(locations)) {
+    if (lastLocation !== null) {
+      const distance = calcCrow(
+        lastLocation.coords.latitude,
+        lastLocation.coords.longitude,
+        locations[locations.length - 1].coords.latitude,
+        locations[locations.length - 1].coords.longitude
+      );
+
+      if (distance >= 100) {
+        lastLocation = locations[locations.length - 1];
+
+        // presentNotificationAsync({
+        //   title: 'Received new locations',
+        //   body: JSON.stringify(locations[locations.length - 1]),
+        // });
+
+        insert('bookings', [
+          {
+            type: 'background',
+            data: JSON.stringify({ location: locations[locations.length - 1] }),
+          },
+        ]);
+      }
+    } else {
+      lastLocation = locations[locations.length - 1];
     }
   }
 });
@@ -121,7 +186,8 @@ export default function BackgroundLocationTask({ children }) {
     console.log(`Task ${GEOFENCING_TASK_NAME} location permission`, permission);
 
     if (permission === 'granted' && !isWeb) {
-      startGeofenceTracking();
+      // startGeofenceTracking();
+      startBackgroundLocationTask();
     }
   }, [permission]);
 

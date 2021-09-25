@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Divider, Text, Surface, Colors } from 'react-native-paper';
-import { search } from 'expo-sqlite-query-helper';
+import { executeSql, search } from 'expo-sqlite-query-helper';
 import ReverseGeocodeLocation from './ReverseGeocodeLocation';
 import { format } from 'date-fns';
 
@@ -24,7 +24,11 @@ export default function History({ lastBooking, refreshHistory }) {
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
-    const result = await search('bookings', null, { timestamp: 'DESC' });
+    const result = await executeSql(
+      'SELECT * FROM bookings WHERE type != "background" ORDER BY timestamp DESC'
+    );
+    // const result = await search('bookings', { type: 'background' }, { timestamp: 'DESC' });
+
     if (Array.isArray(result.rows._array)) {
       setBookings(result.rows._array);
     }
