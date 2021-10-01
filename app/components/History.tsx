@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Divider, Text, Surface, Colors } from 'react-native-paper';
+import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
+import { Divider, Text, Surface, Colors, Card } from 'react-native-paper';
 import { executeSql, search } from 'expo-sqlite-query-helper';
 import ReverseGeocodeLocation from './ReverseGeocodeLocation';
 import { format } from 'date-fns';
 
 const _ = require('lodash');
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  fab: {
-    position: 'absolute',
-    margin: 10,
-    right: 0,
-    top: 0,
-  },
-});
-
 export default function History({ lastBooking, refreshHistory }) {
   // let listViewRef;
   const [refreshing, setRefreshing] = useState(false);
   const [bookings, setBookings] = useState([]);
+
+  const { width } = useWindowDimensions();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      margin: 10,
+      width: width - 20,
+    },
+    fab: {
+      position: 'absolute',
+      margin: 10,
+      right: 0,
+      top: 0,
+    },
+  });
 
   const getBookingsFromDB = async () => {
     setRefreshing(true);
@@ -117,7 +123,7 @@ export default function History({ lastBooking, refreshHistory }) {
   };
 
   return (
-    <View style={styles.container}>
+    <Card style={styles.container}>
       {bookings.length > 0 ? (
         <FlatList
           // ref={(ref) => {
@@ -196,12 +202,12 @@ export default function History({ lastBooking, refreshHistory }) {
 
             return <Divider />;
           }}
-          ListHeaderComponent={() => <View style={{ height: 80 }} />}
-          ListFooterComponent={() => <View style={{ height: 50 }} />}
+          // ListHeaderComponent={() => <View style={{ height: 80 }} />}
+          // ListFooterComponent={() => <View style={{ height: 50 }} />}
         />
       ) : (
         <Text style={{ paddingRight: 20 }}>No data</Text>
       )}
-    </View>
+    </Card>
   );
 }
