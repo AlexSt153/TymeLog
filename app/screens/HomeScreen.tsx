@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, useWindowDimensions } from 'react-native';
-import { Surface, IconButton, Colors, Card, Text } from 'react-native-paper';
+import { IconButton, Colors, Card, Text } from 'react-native-paper';
 import Database, { insert } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import { useStore } from '../store';
 import History from '../components/History';
 import { createBookingsTable } from '../database';
-import { he } from 'date-fns/locale';
 
 export default function HomeScreen({ navigation }) {
   const lastBooking = useStore((state) => state.lastBooking);
@@ -63,8 +62,8 @@ export default function HomeScreen({ navigation }) {
       <Card
         style={{
           height: height * 0.2,
-          marginTop: 15,
-          marginHorizontal: 15,
+          marginTop: 10,
+          marginHorizontal: 10,
           padding: height * 0.08,
           alignItems: 'center',
         }}
@@ -74,17 +73,19 @@ export default function HomeScreen({ navigation }) {
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{
-          position: 'absolute',
-          bottom: 20,
+          // position: 'absolute',
+          marginBottom: 10,
           flexDirection: 'row',
           width: '100%',
           justifyContent: 'space-evenly',
         }}
       >
-        <Surface
+        <Card
           style={{
             backgroundColor: Colors.green600,
-            borderRadius: 100,
+            flex: 0.3,
+            alignItems: 'center',
+            // borderRadius: 100,
           }}
         >
           <IconButton
@@ -94,11 +95,13 @@ export default function HomeScreen({ navigation }) {
             color={Colors.green100}
             onPress={() => insertBooking('start')}
           />
-        </Surface>
-        <Surface
+        </Card>
+        <Card
           style={{
             backgroundColor: Colors.blue600,
-            borderRadius: 100,
+            flex: 0.3,
+            alignItems: 'center',
+            // borderRadius: 100,
           }}
         >
           <IconButton
@@ -108,11 +111,13 @@ export default function HomeScreen({ navigation }) {
             color={Colors.blue100}
             onPress={() => insertBooking('pause')}
           />
-        </Surface>
-        <Surface
+        </Card>
+        <Card
           style={{
             backgroundColor: Colors.red600,
-            borderRadius: 100,
+            flex: 0.3,
+            alignItems: 'center',
+            // borderRadius: 100,
           }}
         >
           <IconButton
@@ -122,7 +127,7 @@ export default function HomeScreen({ navigation }) {
             color={Colors.red100}
             onPress={() => insertBooking('end')}
           />
-        </Surface>
+        </Card>
       </View>
     </SafeAreaView>
   );
