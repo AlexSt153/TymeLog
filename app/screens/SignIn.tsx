@@ -12,18 +12,18 @@ const styles = StyleSheet.create({
   button: {},
 });
 
-export default function SignInScreen() {
+export default function SignIn() {
   const navigation = useNavigation();
 
   const logIn = useStore((state) => state.logIn);
   const setSession = useStore((state) => state.setSession);
   const setCloudSync = useStore((state) => state.setCloudSync);
 
-  const [user, setUser] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    signInUser(user, password)
+    signInUser(email, password)
       .then((user) => {
         console.log(`user`, user);
         const session = supabase.auth.session();
@@ -38,10 +38,10 @@ export default function SignInScreen() {
     <View style={{ flex: 1, justifyContent: 'center' }}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <TextInput
-          label="User"
+          label="Email"
           autoCompleteType="email"
-          value={user}
-          onChangeText={setUser}
+          value={email}
+          onChangeText={setEmail}
           style={styles.textInput}
         />
         <TextInput

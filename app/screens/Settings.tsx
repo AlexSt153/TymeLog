@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   card: { paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5 },
 });
 
-export default function SettingsScreen({ navigation }) {
+export default function Settings({ navigation }) {
   const { dark } = useTheme();
 
   const logOut = useStore((state) => state.logOut);

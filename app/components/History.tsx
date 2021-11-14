@@ -45,7 +45,7 @@ export default function History({ lastBooking, refreshHistory }) {
   }, [lastBooking, refreshHistory]);
 
   useEffect(() => {
-    // console.log(`bookings`, bookings);
+    console.log(`bookings`, bookings);
     setRefreshing(false);
     // if (listViewRef) listViewRef.scrollToEnd({ animated: true });
   }, [bookings]);
@@ -206,7 +206,15 @@ export default function History({ lastBooking, refreshHistory }) {
           // ListFooterComponent={() => <View style={{ height: 50 }} />}
         />
       ) : (
-        <Text style={{ paddingRight: 20 }}>No data</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text>No data</Text>
+        </View>
       )}
     </Card>
   );

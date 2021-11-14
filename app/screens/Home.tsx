@@ -7,7 +7,7 @@ import { useStore } from '../store';
 import History from '../components/History';
 import { createBookingsTable } from '../database';
 
-export default function HomeScreen({ navigation }) {
+export default function Home({ navigation }) {
   const lastBooking = useStore((state) => state.lastBooking);
   const setLastBooking = useStore((state) => state.setLastBooking);
   const [refreshHistory, setRefreshHistory] = useState(false);
@@ -34,28 +34,30 @@ export default function HomeScreen({ navigation }) {
   const insertBooking = async (type) => {
     console.log('type', type);
 
-    if (ForegroundPermission.status === 'granted') {
-      const location = await Location.getLastKnownPositionAsync();
-      if (location !== null) {
-        console.log('location :>> ', location);
+    // if (ForegroundPermission.status === 'granted') {
+    const location = await Location.getLastKnownPositionAsync();
+    // if (location !== null) {
+    console.log('location :>> ', location);
 
-        setLastBooking({ type, timestamp: location.timestamp, data: JSON.stringify({ location }) });
+    setLastBooking({
+      type,
+      timestamp: Date.now(),
+      data: JSON.stringify({ location }),
+    });
 
-        insert('bookings', [
-          {
-            type,
-            data: JSON.stringify({ location }),
-          },
-        ])
-          .then(({ rowAffected, lastQuery }) => {
-            console.log('insertBooking success', rowAffected, lastQuery);
-          })
-          .catch((e) => console.log(e));
-      }
-    }
+    insert('bookings', [
+      {
+        type,
+        data: JSON.stringify({ location }),
+      },
+    ])
+      .then(({ rowAffected, lastQuery }) => {
+        console.log('insertBooking success', rowAffected, lastQuery);
+      })
+      .catch((e) => console.log(e));
+    // }
+    // }
   };
-
-  console.log('HomeScreen');
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

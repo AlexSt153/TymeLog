@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function MapScreen({ navigation }) {
+export default function Map({ navigation }) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
 
