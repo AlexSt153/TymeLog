@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { signInUser, supabase } from '../../lib/supabase';
 import { useStore } from '../store';
@@ -21,17 +21,24 @@ export default function SignIn() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    signInUser(email, password)
-      .then((user) => {
-        console.log(`user`, user);
-        const session = supabase.auth.session();
+  const handleLogin = async () => {
+    const { user, error } = await supabase.auth.signIn({ email, password });
 
-        setSession(session);
-        logIn();
-      })
-      .catch((error) => console.log(`error`, error));
+    if (error) {
+      console.log(error);
+      setErrorMessage(error.message);
+    }
+
+    if (user) {
+      console.log(`user`, user);
+      const session = supabase.auth.session();
+
+      setSession(session);
+      setCloudSync(true);
+      logIn();
+    }
   };
 
   return (
@@ -52,12 +59,18 @@ export default function SignIn() {
           onChangeText={setPassword}
           style={styles.textInput}
         />
+        <HelperText type="error" visible={errorMessage.length > 1}>
+          {errorMessage}
+        </HelperText>
         <View style={styles.row}>
           <Button
             mode="text"
             onPress={() => {
               console.log('navigate to SignUpScreen');
-              navigation.navigate('SignUp');
+              navigation.navigate('SignUp', {
+                email,
+                password,
+              });
             }}
             style={styles.button}
           >

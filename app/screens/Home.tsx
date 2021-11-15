@@ -61,7 +61,7 @@ export default function Home({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Card
+      {/* <Card
         style={{
           height: height * 0.2,
           marginTop: 10,
@@ -71,7 +71,7 @@ export default function Home({ navigation }) {
         }}
       >
         <Text>Charts maybe?</Text>
-      </Card>
+      </Card> */}
       <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
       <View
         style={{

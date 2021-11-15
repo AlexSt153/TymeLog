@@ -144,6 +144,8 @@ export default function History({ lastBooking, refreshHistory }) {
 
             const lastItem = bookings[listItem.index - 1];
 
+            if (!data.location) return null;
+
             return (
               <View
                 style={{

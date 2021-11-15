@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import MapView, { Marker, Circle } from 'react-native-maps';
+import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { search, executeSql } from 'expo-sqlite-query-helper';
 import { useTheme } from '@react-navigation/native';
@@ -102,11 +103,13 @@ export default function Map({ navigation }) {
     bookings.forEach((item) => {
       const data = JSON.parse(item.data);
 
-      bookingMarkers.push({
-        latlng: data.location.coords,
-        title: item.id.toString(),
-        description: item.timestamp,
-      });
+      if (data.location) {
+        bookingMarkers.push({
+          latlng: data.location.coords,
+          title: item.id.toString(),
+          description: item.timestamp,
+        });
+      }
     });
 
     setMarkers(bookingMarkers);
@@ -139,7 +142,7 @@ export default function Map({ navigation }) {
             description={marker.description}
           />
         ))}
-        {regions.map((region, index) => (
+        {regions.map((region: LocationRegion, index) => (
           <Circle
             key={index}
             center={{ latitude: region.latitude, longitude: region.longitude }}

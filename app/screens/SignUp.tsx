@@ -1,9 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { TextInput, HelperText, Button } from 'react-native-paper';
-import { supabase, signInUser } from '../../lib/supabase';
-import { useStore } from '../store';
+import { supabase } from '../../lib/supabase';
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -12,14 +11,13 @@ const styles = StyleSheet.create({
 });
 
 export default function SignUp() {
+  const route: RouteProp<{ params: { email: string; password: string } }, 'params'> = useRoute();
+
   const navigation = useNavigation();
 
-  const logIn = useStore((state) => state.logIn);
-  const setSession = useStore((state) => state.setSession);
-
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(route.params.email || '');
   const [emailError, setEmailError] = useState(false);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(route.params.password || '');
   const [password2, setPassword2] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorType, setPasswordErrorType] = useState('');
@@ -98,20 +96,13 @@ export default function SignUp() {
               password,
             });
 
-            console.log({ user, error });
-
             if (!error) {
               console.log('signed up');
 
-              signInUser(email, password)
-                .then((user) => {
-                  console.log(`user`, user);
-                  const session = supabase.auth.session();
-
-                  setSession(session);
-                  logIn();
-                })
-                .catch((error) => console.log(`error`, error));
+              navigation.navigate('Confirm', {
+                email,
+                password,
+              });
             }
           }}
           style={styles.button}

@@ -15,6 +15,7 @@ module.exports = () => {
         resizeMode: 'contain',
         backgroundColor: '#002147',
       },
+      scheme: 'tymelog',
       updates: {
         enabled: true,
         checkAutomatically: 'ON_LOAD',
