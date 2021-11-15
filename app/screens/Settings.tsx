@@ -37,6 +37,8 @@ export default function Settings({ navigation }) {
   const setEncryption = useStore((state) => state.setEncryption);
   const cloudSync = useStore((state) => state.cloudSync);
   const setCloudSync = useStore((state) => state.setCloudSync);
+  const session = useStore((state) => state.session);
+  const setSession = useStore((state) => state.setSession);
 
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState({
     granted: false,
@@ -69,6 +71,8 @@ export default function Settings({ navigation }) {
       Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
         setHasBackgroundLocationUpdates(started);
       });
+
+      console.log('session :>> ', session);
     });
 
     return unsubscribe;
@@ -258,31 +262,46 @@ export default function Settings({ navigation }) {
           >
             Delete data
           </Button>
-          <Button
-            onPress={() => {
-              Alert.alert(
-                'Logout',
-                'Are you sure you want to logout?',
-                [
+          {Object.keys(session).length === 0 ? (
+            <Button
+              onPress={() => {
+                setSession({});
+                logOut();
+              }}
+              style={styles.button}
+            >
+              Login
+            </Button>
+          ) : (
+            <Button
+              onPress={() => {
+                Alert.alert(
+                  'Logout',
+                  'Are you sure you want to logout?',
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => console.log('Cancel Pressed'),
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Yes!',
+                      onPress: () => {
+                        setSession({});
+                        logOut();
+                      },
+                    },
+                  ],
                   {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Yes!',
-                    onPress: () => logOut(),
-                  },
-                ],
-                {
-                  cancelable: true,
-                }
-              );
-            }}
-            style={styles.button}
-          >
-            Logout
-          </Button>
+                    cancelable: true,
+                  }
+                );
+              }}
+              style={styles.button}
+            >
+              Logout
+            </Button>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
