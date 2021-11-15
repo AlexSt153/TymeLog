@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { User, Session } from '@supabase/supabase-js';
 
 type lastBooking = {
   type: string;
@@ -12,8 +13,10 @@ type MainState = {
   loggedIn: boolean;
   logIn: () => void;
   logOut: () => void;
-  session: object;
-  setSession: (session: object) => void;
+  user: User | null;
+  setUser: (user: User | object) => void;
+  session: Session | null;
+  setSession: (session: Session | object) => void;
   theme: string;
   setTheme: (theme: string) => void;
   lockSettings: boolean;
@@ -36,8 +39,10 @@ export const useStore = create<MainState>(
       loggedIn: false,
       logIn: () => set(() => ({ loggedIn: true })),
       logOut: () => set(() => ({ loggedIn: false })),
-      session: {},
-      setSession: (session) => set(() => ({ session })),
+      user: null,
+      setUser: (user: User) => set(() => ({ user })),
+      session: null,
+      setSession: (session: Session) => set(() => ({ session })),
       theme: 'system',
       setTheme: (theme) => set(() => ({ theme })),
       lockSettings: false,

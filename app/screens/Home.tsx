@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, useWindowDimensions } from 'react-native';
 import { IconButton, Colors, Card, Text } from 'react-native-paper';
-import Database, { insert } from 'expo-sqlite-query-helper';
+import Database from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import { useStore } from '../store';
 import History from '../components/History';
 import { createBookingsTable } from '../database';
+import { isNotWeb } from '../../App';
+import { insertBooking } from '../api/bookings';
 
 export default function Home({ navigation }) {
   const lastBooking = useStore((state) => state.lastBooking);
@@ -15,10 +17,11 @@ export default function Home({ navigation }) {
 
   const { width, height } = useWindowDimensions();
 
-  Database('tymelog.db');
-
   useEffect(() => {
-    createBookingsTable();
+    if (isNotWeb) {
+      Database('tymelog.db');
+      createBookingsTable();
+    }
     Location.requestForegroundPermissionsAsync().then((status) => setForegroundPermission(status));
   }, []);
 
@@ -31,7 +34,7 @@ export default function Home({ navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const insertBooking = async (type) => {
+  const addBooking = async (type: string) => {
     console.log('type', type);
 
     // if (ForegroundPermission.status === 'granted') {
@@ -45,18 +48,12 @@ export default function Home({ navigation }) {
       data: JSON.stringify({ location }),
     });
 
-    insert('bookings', [
-      {
-        type,
-        data: JSON.stringify({ location }),
-      },
-    ])
-      .then(({ rowAffected, lastQuery }) => {
-        console.log('insertBooking success', rowAffected, lastQuery);
-      })
-      .catch((e) => console.log(e));
-    // }
-    // }
+    try {
+      const result = await insertBooking({ type, location });
+      console.log('insert result', result);
+    } catch (error) {
+      console.log('insert error', error);
+    }
   };
 
   return (
@@ -95,7 +92,7 @@ export default function Home({ navigation }) {
             icon="play-circle-outline"
             size={30}
             color={Colors.green100}
-            onPress={() => insertBooking('start')}
+            onPress={() => addBooking('start')}
           />
         </Card>
         <Card
@@ -111,7 +108,7 @@ export default function Home({ navigation }) {
             icon="pause-circle-outline"
             size={30}
             color={Colors.blue100}
-            onPress={() => insertBooking('pause')}
+            onPress={() => addBooking('pause')}
           />
         </Card>
         <Card
@@ -127,7 +124,7 @@ export default function Home({ navigation }) {
             icon="stop-circle-outline"
             size={30}
             color={Colors.red100}
-            onPress={() => insertBooking('end')}
+            onPress={() => addBooking('end')}
           />
         </Card>
       </View>

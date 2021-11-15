@@ -45,7 +45,7 @@ export default function History({ lastBooking, refreshHistory }) {
   }, [lastBooking, refreshHistory]);
 
   useEffect(() => {
-    console.log(`bookings`, bookings);
+    // console.log(`bookings`, bookings);
     setRefreshing(false);
     // if (listViewRef) listViewRef.scrollToEnd({ animated: true });
   }, [bookings]);

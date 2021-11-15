@@ -12,6 +12,7 @@ import {
   BACKGROUND_LOCATION_TASK_NAME,
   GEOFENCING_TASK_NAME,
 } from '../core/BackgroundLocationTask';
+import { isNotWeb } from '../../App';
 
 const styles = StyleSheet.create({
   container: {
@@ -64,13 +65,15 @@ export default function Settings({ navigation }) {
         setHasNotificationPermission(permissions);
       });
 
-      Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
-        setHasGeofencingStarted(started);
-      });
+      if (isNotWeb) {
+        Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
+          setHasGeofencingStarted(started);
+        });
 
-      Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
-        setHasBackgroundLocationUpdates(started);
-      });
+        Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
+          setHasBackgroundLocationUpdates(started);
+        });
+      }
 
       console.log('session :>> ', session);
     });
@@ -216,52 +219,66 @@ export default function Settings({ navigation }) {
             <List.Item
               title="Secure settings"
               right={() => (
-                <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
+                <Switch
+                  disabled
+                  value={lockSettings}
+                  onValueChange={() => setLockSettings(!lockSettings)}
+                />
               )}
             />
             <List.Item
               title="Encryption"
               right={() => (
-                <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
+                <Switch
+                  disabled
+                  value={encryption}
+                  onValueChange={() => setEncryption(!encryption)}
+                />
               )}
             />
             <List.Item
               title="Cloud Sync"
               right={() => (
-                <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
+                <Switch
+                  disabled={Object.keys(session).length === 0}
+                  value={cloudSync}
+                  onValueChange={() => setCloudSync(!cloudSync)}
+                />
               )}
             />
           </Card>
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
-          <Button
-            onPress={() => {
-              Alert.alert(
-                'Delete local data',
-                'Are you sure you want purge all data from the datebase?',
-                [
-                  {
-                    text: 'Cancel',
-                    onPress: () => console.log('Cancel Pressed'),
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Yes!',
-                    onPress: () => {
-                      dropTable('bookings');
-                      createBookingsTable();
+          {isNotWeb && (
+            <Button
+              onPress={() => {
+                Alert.alert(
+                  'Delete local data',
+                  'Are you sure you want purge all data from the datebase?',
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => console.log('Cancel Pressed'),
+                      style: 'cancel',
                     },
-                  },
-                ],
-                {
-                  cancelable: true,
-                }
-              );
-            }}
-            style={styles.button}
-          >
-            Delete data
-          </Button>
+                    {
+                      text: 'Yes!',
+                      onPress: () => {
+                        dropTable('bookings');
+                        createBookingsTable();
+                      },
+                    },
+                  ],
+                  {
+                    cancelable: true,
+                  }
+                );
+              }}
+              style={styles.button}
+            >
+              Delete data
+            </Button>
+          )}
           {Object.keys(session).length === 0 ? (
             <Button
               onPress={() => {

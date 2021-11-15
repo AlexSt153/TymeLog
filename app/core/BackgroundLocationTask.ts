@@ -142,7 +142,7 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, er
   }
 });
 
-export default function BackgroundLocationTask({ children }) {
+export default function BackgroundLocationTask() {
   const [isAvailable, setIsAvailable] = useState(0);
   const [isRegistered, setIsRegistered] = useState(false);
   const [permission, setPermission] = useState({});
@@ -191,5 +191,5 @@ export default function BackgroundLocationTask({ children }) {
     }
   }, [permission]);
 
-  return children;
+  return null;
 }

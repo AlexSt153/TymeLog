@@ -12,7 +12,7 @@ import {
   GEOFENCING_TASK_NAME,
 } from './BackgroundLocationTask';
 
-export default function BackgroundTasks({ children }) {
+export default function BackgroundTasks() {
   const cloudSync = useStore((state) => state.cloudSync);
   const loggedIn = useStore((state) => state.loggedIn);
   const session = useStore((state) => state.session);
@@ -55,5 +55,5 @@ export default function BackgroundTasks({ children }) {
     };
   }, []);
 
-  return children;
+  return null;
 }

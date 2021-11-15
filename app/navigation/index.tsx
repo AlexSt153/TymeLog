@@ -23,24 +23,28 @@ const CombinedDefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
 const CombinedDarkTheme = merge(PaperDarkTheme, NavigationDarkTheme);
 
 export default function Navigation() {
-  const cloudSync = useStore((state) => state.cloudSync);
   const loggedIn = useStore((state) => state.loggedIn);
   const session = useStore((state) => state.session);
   const setSession = useStore((state) => state.setSession);
+  const user = useStore((state) => state.user);
+  const setUser = useStore((state) => state.setUser);
 
   const theme = useStore((state) => state.theme);
   const scheme = useColorScheme();
 
   useEffect(() => {
-    if (cloudSync === true) {
-      const refreshSession = async () => {
-        const { data, error } = await supabase.auth.refreshSession();
-        console.log(`refreshSession`, data, error);
-        setSession(data);
-      };
+    const session = supabase.auth.session();
+    setSession(session);
+    setUser(session?.user ?? null);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(`Supabase auth event: ${event}`);
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
 
-      refreshSession();
-    }
+    return () => {
+      authListener!.unsubscribe();
+    };
   }, []);
 
   const preferredTheme = () => {
@@ -70,32 +74,16 @@ export default function Navigation() {
   };
 
   const AuthAppStack = () => {
-    // console.log(`cloudSync`, cloudSync);
-    // console.log(`loggedIn`, loggedIn);
-    // console.log(`session`, session);
-
-    if (cloudSync === true && loggedIn === false) {
+    if (loggedIn === false) {
       return <AuthStack />;
     }
 
-    if (cloudSync === true && loggedIn === true && session) {
-      return (
-        <BackgroundLocationTask>
-          <AppStack />
-        </BackgroundLocationTask>
-      );
+    if (user && session) {
+      return <AppStack />;
     }
 
-    if (cloudSync === false && loggedIn === false) {
-      return <AuthStack />;
-    }
-
-    if (cloudSync === false && loggedIn === true) {
-      return (
-        <BackgroundLocationTask>
-          <AppStack />
-        </BackgroundLocationTask>
-      );
+    if (loggedIn === true) {
+      return <AppStack />;
     }
 
     return null;
