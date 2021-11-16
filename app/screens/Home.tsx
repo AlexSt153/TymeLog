@@ -5,8 +5,9 @@ import moment from 'moment';
 import { useStore } from '../store';
 import History from '../components/History';
 import { getAllBookings, insertBookings } from '../api/bookings';
-import { deviceOS, isNotWeb } from '../tools/deviceInfo';
+import { deviceOS, isIOS } from '../tools/deviceInfo';
 import BookingButtons from '../components/BookingButtons';
+import { supabase } from '../../lib/supabase';
 
 export default function Home({ navigation }) {
   const session = useStore((state) => state.session);
@@ -32,6 +33,16 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     Location.requestForegroundPermissionsAsync().then((status) => setForegroundPermission(status));
+    const bookingChangeSubscription = supabase
+      .from('bookings')
+      .on('*', () => {
+        getBookings();
+      })
+      .subscribe();
+
+    return () => {
+      bookingChangeSubscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -47,7 +58,7 @@ export default function Home({ navigation }) {
     console.log('type', type);
 
     let location = null;
-    if (isNotWeb) {
+    if (isIOS) {
       location = await Location.getLastKnownPositionAsync();
     } else {
       location = await Location.getCurrentPositionAsync({});

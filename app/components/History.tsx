@@ -157,7 +157,7 @@ export default function History({ bookings, getBookings, refreshing }) {
                     style={{
                       width: '80%',
                       flexDirection: 'column',
-                      flexWrap: 'wrap',
+                      marginTop: 10,
                     }}
                   >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

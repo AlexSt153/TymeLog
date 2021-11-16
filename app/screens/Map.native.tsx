@@ -9,6 +9,8 @@ import { useTheme } from '@react-navigation/native';
 import { useTheme as usePaperTheme } from 'react-native-paper';
 import { format } from 'date-fns';
 import { useStore } from '../store';
+import { getAllBookings } from '../api/bookings';
+import moment from 'moment';
 
 const styles = StyleSheet.create({
   container: {
@@ -33,7 +35,8 @@ export default function Map({ navigation }) {
   const [startDateText, setStartDateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
   const [endDateText, setEndDateText] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
 
-  const [bookings, setBookings] = useState([]);
+  const bookings = useStore((state) => state.bookings);
+  const setBookings = useStore((state) => state.setBookings);
   const [markers, setMarkers] = useState([]);
   const [region, setRegion] = useState(null);
   const regions = useStore((state) => state.regions);
@@ -59,7 +62,14 @@ export default function Map({ navigation }) {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const getBookingsFromDB = async () => {};
+  const getBookingsFromDB = async () => {
+    const { bookings, error } = await getAllBookings();
+    if (error) {
+      console.log(error);
+    } else {
+      setBookings(bookings);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -72,15 +82,19 @@ export default function Map({ navigation }) {
   useEffect(() => {
     const bookingMarkers = [];
 
-    bookings.forEach((item) => {
-      const data = JSON.parse(item.data);
+    bookings.forEach((booking) => {
+      try {
+        const { location } = booking;
 
-      if (data.location) {
-        bookingMarkers.push({
-          latlng: data.location.coords,
-          title: item.id.toString(),
-          description: item.timestamp,
-        });
+        if (location) {
+          bookingMarkers.push({
+            latlng: location.coords,
+            title: booking.id.toString(),
+            description: booking.timestamp,
+          });
+        }
+      } catch (error) {
+        console.warn(error);
       }
     });
 
@@ -135,8 +149,9 @@ export default function Map({ navigation }) {
         backgroundStyle={{ backgroundColor: colors.background }}
       >
         <View style={styles.contentContainer}>
-          <Text onPress={() => setOpen(true)}>{startDateText}</Text>
-          <Text onPress={() => setOpen(true)}>{endDateText}</Text>
+          <Text style={{ marginTop: 10 }} onPress={() => setOpen(true)}>
+            {moment(startDateText).format('yyyy-MM-DD')}
+          </Text>
           <DatePickerModal
             mode="single"
             visible={open}
