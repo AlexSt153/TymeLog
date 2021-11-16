@@ -2,7 +2,10 @@
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useState, useEffect, useRef } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
+import { supabase } from '../../lib/supabase';
+import { useStore } from '../store';
+import { isAndroid } from '../tools/deviceInfo';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -84,6 +87,8 @@ export default function NotificationHandler() {
 }
 
 async function registerForPushNotificationsAsync() {
+  const { session } = useStore.getState();
+
   let token;
   if (Constants.isDevice) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -93,16 +98,22 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+      console.log('Failed to get push token for push notification!');
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+
+    const { data, error } = await supabase.from('profiles').upsert({
+      id: session.user.id,
+      push_token: token,
+    });
+
+    console.log('sendPushToken to supabase', { data, error });
   } else {
-    alert('Must use physical device for Push Notifications');
+    console.log('Must use physical device for Push Notifications');
   }
 
-  if (Platform.OS === 'android') {
+  if (isAndroid) {
     Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,

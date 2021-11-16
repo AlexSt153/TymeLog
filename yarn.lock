@@ -1507,17 +1507,6 @@
     lodash.pick "^4.4.0"
     lodash.template "^4.5.0"
 
-"@expo/websql@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@expo/websql/-/websql-1.0.1.tgz#fff0cf9c1baa1f70f9e1d658b7c39a420d9b10a9"
-  integrity sha1-//DPnBuqH3D54dZYt8OaQg2bEKk=
-  dependencies:
-    argsarray "^0.0.1"
-    immediate "^3.2.2"
-    noop-fn "^1.0.0"
-    pouchdb-collections "^1.0.1"
-    tiny-queue "^0.2.1"
-
 "@googlemaps/js-api-loader@^1.7.0":
   version "1.12.9"
   resolved "https://registry.yarnpkg.com/@googlemaps/js-api-loader/-/js-api-loader-1.12.9.tgz#d9fdd8273aef27590d9254f9ae0573e9919ae4d1"
@@ -2953,11 +2942,6 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-argsarray@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/argsarray/-/argsarray-0.0.1.tgz#6e7207b4ecdb39b0af88303fa5ae22bda8df61cb"
-  integrity sha1-bnIHtOzbObCviDA/pa4ivajfYcs=
-
 arr-diff@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/arr-diff/-/arr-diff-1.1.0.tgz#687c32758163588fef7de7b36fabe495eb1a399a"
@@ -3898,11 +3882,6 @@ cross-spawn@^7.0.0:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-crypto-js@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.0.0.tgz#2904ab2677a9d042856a2ea2ef80de92e4a36dcc"
-  integrity sha512-bzHZN8Pn+gS7DQA6n+iUmBfl0hO5DJq++QP3U6uTucDtk/0iGpXd/Gg7CGR0p8tJhofJyaKoWBuJI4eAO00BBg==
-
 crypto-random-string@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-1.0.0.tgz#a230f64f568310e1498009940790ec99545bca7e"
@@ -4416,19 +4395,6 @@ expo-asset@~8.3.2:
     path-browserify "^1.0.0"
     url-parse "^1.4.4"
 
-expo-background-fetch@~9.2.2:
-  version "9.2.2"
-  resolved "https://registry.yarnpkg.com/expo-background-fetch/-/expo-background-fetch-9.2.2.tgz#59328981817e05e59f1a62e7d844c412728916ac"
-  integrity sha512-9DSHZkhun36mWzTrAx8GoTkkx5a06vmeaPQfQCo0DE1cNiMl3//HOFk04YdKmFcyTHJ+wIJFFGsNdjHiYH18+g==
-  dependencies:
-    "@expo/config-plugins" "^3.0.0"
-    expo-task-manager "~9.2.2"
-
-expo-blur@~9.0.3:
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/expo-blur/-/expo-blur-9.0.3.tgz#5095b5bd04d000f73b351d0e4736767b86b49bbd"
-  integrity sha512-7jMqzo53eg5t9Uc1Tg+yGu9lKL9the4CWAQO0kC6YMhrsDiB13mwOUesC+IScHDTSUKNMGcHI8kN+OmvEWfPig==
-
 expo-constants@11.0.1, expo-constants@~11.0.1:
   version "11.0.1"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-11.0.1.tgz#8a33d9702d03289ab68d6de2bbeb2bbc9654734c"
@@ -4517,20 +4483,6 @@ expo-ota-manager@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/expo-ota-manager/-/expo-ota-manager-1.1.4.tgz#2a6a6e023527fb5eee24e980971fdd35f3f8664f"
   integrity sha512-A5WvmVzZIjKOwsNMJoljNUUf+10m+QyWLd5NFYslq61Jg0c4xW6bgrvZ0WbrQK/oO8MqwKaJ9I0CdFNaGqJAjg==
-
-expo-sqlite-query-helper@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/expo-sqlite-query-helper/-/expo-sqlite-query-helper-1.1.4.tgz#afe85d79fc0a7dc7c717e58ff75225ef93b0c4c9"
-  integrity sha512-Nvimcq49z1KBQ+Ab605WHbVILUygd3+fL40AUK41+aLKvVkJBfSRqXq7qjEps9odVLGPsWi6II21GDVX+oU6vQ==
-
-expo-sqlite@~9.2.1:
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/expo-sqlite/-/expo-sqlite-9.2.1.tgz#ec08f874f64d41278b6c27a4a63f8acd192c65c1"
-  integrity sha512-OTN3Dn/S07rmPEiMA8D4OXWvSwahckyAFWqgCAPUy6yjYI1O5ykhXZ37eerFJNMgSZqfOQ719lpYB0pdIKY6kA==
-  dependencies:
-    "@expo/websql" "^1.0.1"
-    expo-modules-core "~0.2.0"
-    lodash "^4.17.15"
 
 expo-status-bar@~1.0.4:
   version "1.0.4"
@@ -5321,11 +5273,6 @@ image-size@^0.6.0:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.6.3.tgz#e7e5c65bb534bd7cdcedd6cb5166272a85f75fb2"
   integrity sha512-47xSUiQioGaB96nqtp5/q55m0aBQSQdyIloMOc/x+QVTDZLNmXE892IIDrJ0hM1A5vcNUDD5tDffkSP5lCaIIA==
-
-immediate@^3.2.2:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.3.0.tgz#1aef225517836bcdf7f2a2de2600c79ff0269266"
-  integrity sha512-HR7EVodfFUdQCTIeySw+WDRFJlPcLOJbXfwwZ7Oom6tjsvZ3bOkCDJHehQC3nxJrv7+f9XecwazynjU8e4Vw3Q==
 
 immediate@~3.0.5:
   version "3.0.6"
@@ -7074,6 +7021,18 @@ mockdate@^3.0.2:
   resolved "https://registry.yarnpkg.com/mockdate/-/mockdate-3.0.5.tgz#789be686deb3149e7df2b663d2bc4392bc3284fb"
   integrity sha512-iniQP4rj1FhBdBYS/+eQv7j1tadJ9lJtdzgOpvsOHng/GbcDh2Fhdeq+ZRldrPYdXvCyfFUmFeEwEGXZB5I/AQ==
 
+moment-timezone@^0.5.34:
+  version "0.5.34"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.34.tgz#a75938f7476b88f155d3504a9343f7519d9a405c"
+  integrity sha512-3zAEHh2hKUs3EXLESx/wsgw6IQdusOT8Bxm3D9UrHPQR7zlMmzwybC8zHEM1tQ4LJwP7fcxrWr8tuBg05fFCbg==
+  dependencies:
+    moment ">= 2.9.0"
+
+"moment@>= 2.9.0", moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+
 moti@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/moti/-/moti-0.11.0.tgz#0d0d94ab3d4badb76e1d7df2e54ad3a5b2e0dcd0"
@@ -7221,11 +7180,6 @@ node-stream-zip@^1.9.1:
   version "1.13.3"
   resolved "https://registry.yarnpkg.com/node-stream-zip/-/node-stream-zip-1.13.3.tgz#63235337abebcef408b244b4e28f28961e6e86f0"
   integrity sha512-Vv95ug+8Jfug4AxcqNV7TeGEk2antNidj+YBOyP8SS8LTHJmjsE3d9h6L831eJtO8p7jesJ3CDtgkwmLO/wcSw==
-
-noop-fn@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/noop-fn/-/noop-fn-1.0.0.tgz#5f33d47f13d2150df93e0cb036699e982f78ffbf"
-  integrity sha1-XzPUfxPSFQ35PgywNmmemC94/78=
 
 normalize-css-color@^1.0.2:
   version "1.0.2"
@@ -7738,11 +7692,6 @@ posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
-
-pouchdb-collections@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/pouchdb-collections/-/pouchdb-collections-1.0.1.tgz#fe63a17da977611abef7cb8026cb1a9553fd8359"
-  integrity sha1-/mOhfal3YRq+98uAJssalVP9g1k=
 
 prelude-ls@~1.1.2:
   version "1.1.2"
@@ -9115,11 +9064,6 @@ timm@^1.6.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/timm/-/timm-1.7.1.tgz#96bab60c7d45b5a10a8a4d0f0117c6b7e5aff76f"
   integrity sha512-IjZc9KIotudix8bMaBW6QvMuq64BrJWFs1+4V0lXwWGQZwH+LnX87doAYhem4caOEusRP9/g6jVDQmZ8XOk1nw==
-
-tiny-queue@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/tiny-queue/-/tiny-queue-0.2.1.tgz#25a67f2c6e253b2ca941977b5ef7442ef97a6046"
-  integrity sha1-JaZ/LG4lOyypQZd7XvdELvl6YEY=
 
 tinycolor2@^1.4.1:
   version "1.4.2"

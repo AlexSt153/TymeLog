@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import { Divider, Text, Surface, Colors, Card } from 'react-native-paper';
-import ReverseGeocodeLocation from './ReverseGeocodeLocation';
-import { format } from 'date-fns';
-import { getAllBookings } from '../api/bookings';
-import { useStore } from '../store';
+import moment from 'moment';
+import AddressLine from './AddressLine';
 
 const _ = require('lodash');
 
-export default function History({ lastBooking, refreshHistory }) {
-  // let listViewRef;
-  const [refreshing, setRefreshing] = useState(false);
-  const bookings = useStore((state) => state.bookings);
-  const setBookings = useStore((state) => state.setBookings);
-
+export default function History({ bookings, getBookings, refreshing }) {
   const { width } = useWindowDimensions();
 
   const styles = StyleSheet.create({
@@ -29,28 +22,6 @@ export default function History({ lastBooking, refreshHistory }) {
       top: 0,
     },
   });
-
-  const getBookings = async () => {
-    setRefreshing(true);
-
-    const { bookings, error } = await getAllBookings();
-
-    if (error) {
-      console.log(error);
-    } else {
-      setBookings(bookings.reverse());
-    }
-  };
-
-  useEffect(() => {
-    getBookings();
-  }, [lastBooking, refreshHistory]);
-
-  useEffect(() => {
-    // console.log(`bookings`, bookings);
-    setRefreshing(false);
-    // if (listViewRef) listViewRef.scrollToEnd({ animated: true });
-  }, [bookings]);
 
   const backgroundColor = (type) => {
     switch (type) {
@@ -128,9 +99,6 @@ export default function History({ lastBooking, refreshHistory }) {
     <Card style={styles.container}>
       {bookings.length > 0 ? (
         <FlatList
-          // ref={(ref) => {
-          //   listViewRef = ref;
-          // }}
           style={{ flex: 1, width: '100%' }}
           inverted
           data={bookings}
@@ -193,10 +161,10 @@ export default function History({ lastBooking, refreshHistory }) {
                     }}
                   >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text>{item.timestamp}</Text>
-                      <Text>{item.timestamp}</Text>
+                      <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
+                      <Text>{moment(item.timestamp).format('DD.MM.YY')}</Text>
                     </View>
-                    <ReverseGeocodeLocation coords={location.coords} />
+                    <AddressLine address={item.address} />
                   </View>
                 </View>
               );
@@ -210,8 +178,6 @@ export default function History({ lastBooking, refreshHistory }) {
 
             return <Divider />;
           }}
-          // ListHeaderComponent={() => <View style={{ height: 80 }} />}
-          // ListFooterComponent={() => <View style={{ height: 50 }} />}
         />
       ) : (
         <View

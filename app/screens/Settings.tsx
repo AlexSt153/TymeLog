@@ -4,14 +4,13 @@ import { SafeAreaView, ScrollView, View, StyleSheet, Alert } from 'react-native'
 import { Button, List, Switch, Card } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
-import { dropTable } from 'expo-sqlite-query-helper';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import {
   BACKGROUND_LOCATION_TASK_NAME,
   GEOFENCING_TASK_NAME,
 } from '../core/BackgroundLocationTask';
-import { isNotWeb } from '../../App';
+import { isNotWeb } from '../tools/deviceInfo';
 
 const styles = StyleSheet.create({
   container: {

@@ -5,7 +5,6 @@ import { DatePickerModal } from 'react-native-paper-dates';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { search, executeSql } from 'expo-sqlite-query-helper';
 import { useTheme } from '@react-navigation/native';
 import { useTheme as usePaperTheme } from 'react-native-paper';
 import { format } from 'date-fns';
@@ -39,8 +38,6 @@ export default function Map({ navigation }) {
   const [region, setRegion] = useState(null);
   const regions = useStore((state) => state.regions);
 
-  // console.log('regions', regions);
-
   const { dark } = useTheme();
   const { colors } = usePaperTheme();
 
@@ -62,32 +59,7 @@ export default function Map({ navigation }) {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const getBookingsFromDB = async () => {
-    // const result = await search('bookings', { timestamp: { $gt: 0 } });
-
-    const result = await executeSql(
-      `SELECT * FROM bookings WHERE timestamp BETWEEN '${startDateText}' AND '${endDateText}'`
-    );
-
-    console.log('result :>> ', result);
-
-    if (Array.isArray(result.rows._array)) {
-      setBookings(result.rows._array);
-
-      const arrayLength = result.rows._array.length;
-      if (arrayLength > 0) {
-        const { data } = result.rows._array[arrayLength - 1];
-        const dataJSON = JSON.parse(data);
-
-        setRegion({
-          latitude: dataJSON.location?.coords?.latitude,
-          latitudeDelta: 0.054351194827738425,
-          longitude: dataJSON.location?.coords?.longitude,
-          longitudeDelta: 0.028632897433652715,
-        });
-      }
-    }
-  };
+  const getBookingsFromDB = async () => {};
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {

@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Platform } from 'react-native';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 import { LocationGeofencingEventType } from 'expo-location';
-import { insert } from 'expo-sqlite-query-helper';
 // import { presentNotificationAsync } from './NotificationHandler';
 import { useStore } from '../store';
+import { deviceOS, isAndroid, isNotWeb } from '../tools/deviceInfo';
+import { insertBookings } from '../api/bookings';
+import moment from 'moment';
 
-const isWeb = Platform.OS === 'web';
 export const BACKGROUND_LOCATION_TASK_NAME = 'background-location-task';
 export const GEOFENCING_TASK_NAME = 'background-geofencing-task';
-const geofencingBounceTimeout = Platform.OS === 'android' ? 5000 : 1000;
+const geofencingBounceTimeout = isAndroid ? 5000 : 1000;
 let lastDate = new Date();
 let lastTimeStamp = lastDate.getTime();
 let lastLocation = null;
@@ -35,7 +35,7 @@ function toRad(Value: number) {
 }
 
 export const startGeofenceTracking = async () => {
-  const setRegions = useStore.getState().setRegions;
+  const { session, setRegions } = useStore.getState();
 
   const location = await Location.getCurrentPositionAsync();
 
@@ -43,16 +43,15 @@ export const startGeofenceTracking = async () => {
   const regions = [];
 
   if (location) {
-    insert('bookings', [
+    await insertBookings([
       {
+        user_id: session.user.id,
         type: 'background',
-        data: JSON.stringify({ location }),
+        location,
+        timestamp: moment().format(),
+        origin: deviceOS,
       },
-    ])
-      .then(({ rowAffected, lastQuery }) => {
-        console.log('background-location-task success', rowAffected, lastQuery);
-      })
-      .catch((e) => console.log(e));
+    ]);
 
     let radius = location.coords.speed * location.coords.speed;
 
@@ -107,6 +106,8 @@ export const startBackgroundLocationTask = async () => {
 
 // @ts-ignore
 TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
+  const { session } = useStore.getState();
+
   if (error) {
     console.log(`error`, error);
     return;
@@ -129,10 +130,13 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, er
         //   body: JSON.stringify(locations[locations.length - 1]),
         // });
 
-        insert('bookings', [
+        insertBookings([
           {
+            user_id: session.user.id,
             type: 'background',
-            data: JSON.stringify({ location: locations[locations.length - 1] }),
+            location: locations[locations.length - 1],
+            timestamp: moment().format(),
+            origin: deviceOS,
           },
         ]);
       }
@@ -185,7 +189,7 @@ export default function BackgroundLocationTask() {
   useEffect(() => {
     console.log(`Task ${GEOFENCING_TASK_NAME} location permission`, permission);
 
-    if (permission === 'granted' && !isWeb) {
+    if (permission === 'granted' && isNotWeb) {
       // startGeofenceTracking();
       startBackgroundLocationTask();
     }

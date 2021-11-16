@@ -1,4 +1,6 @@
 import { supabase } from '../../lib/supabase';
+import { getCoordsResultFromCache } from './location';
+import { LocationObject } from 'expo-location';
 
 export const getAllBookings = async () => {
   const { data: bookings, error } = await supabase.from('bookings').select('*');
@@ -7,16 +9,26 @@ export const getAllBookings = async () => {
 
 interface InsertBookingProps {
   user_id: string;
-  location: any;
+  location: LocationObject;
   encrypted?: boolean;
   address?: string;
   timestamp: string;
   data?: any;
-  origin?: string;
+  origin: string;
   type: string;
 }
 
 export const insertBookings = async (bookings: InsertBookingProps[]) => {
-  const { data, error } = await supabase.from('bookings').insert(bookings);
+  // for each booking reverse geocode to get address
+  const bookingsWithAddress = await Promise.all(
+    bookings.map(async (booking) => {
+      const { location } = booking;
+      const address = await getCoordsResultFromCache(location.coords);
+      booking.address = `${address.name}, ${address.city}, ${address.country}`;
+      return booking;
+    })
+  );
+
+  const { data, error } = await supabase.from('bookings').insert(bookingsWithAddress);
   return { data, error };
 };

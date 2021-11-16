@@ -6,7 +6,13 @@ interface Coords {
   longitude: number;
 }
 
-export const getCoordsResultFromCache = (coords: Coords) => {
+export type Address = {
+  name: string;
+  city: string;
+  country: string;
+};
+
+export const getCoordsResultFromCache = (coords: Coords): Promise<Address> => {
   return new Promise(async (resolve, reject) => {
     const coordsJSON = JSON.stringify(coords);
     const coordsResult = await cache.get(coordsJSON);
