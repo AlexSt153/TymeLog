@@ -15,10 +15,7 @@ const styles = StyleSheet.create({
 export default function SignIn() {
   const navigation = useNavigation();
 
-  const logIn = useStore((state) => state.logIn);
-  const setUser = useStore((state) => state.setUser);
   const setSession = useStore((state) => state.setSession);
-  const setCloudSync = useStore((state) => state.setCloudSync);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,9 +34,6 @@ export default function SignIn() {
       const session = supabase.auth.session();
 
       setSession(session);
-      setUser(session?.user ?? null);
-      setCloudSync(true);
-      logIn();
     }
   };
 
@@ -83,19 +77,6 @@ export default function SignIn() {
           </Button>
         </View>
       </KeyboardAvoidingView>
-      <View
-        style={[styles.container, { marginTop: 25, height: 100, justifyContent: 'space-evenly' }]}
-      >
-        <Text>OR</Text>
-        <Button
-          onPress={() => {
-            setCloudSync(false);
-            logIn();
-          }}
-        >
-          use App in offline mode
-        </Button>
-      </View>
     </View>
   );
 }

@@ -27,37 +27,35 @@ export default function NotificationHandler() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  if (Platform.OS !== 'web') {
-    Notifications.getPermissionsAsync().then((settings) => {
-      // console.log(`settings`, settings);
+  Notifications.getPermissionsAsync().then((settings) => {
+    // console.log(`settings`, settings);
 
-      if (settings.canAskAgain === false) {
-        Alert.alert('Notifications permission denied', JSON.stringify(settings));
-      }
+    if (settings.canAskAgain === false) {
+      Alert.alert('Notifications permission denied', JSON.stringify(settings));
+    }
 
-      if (
-        settings.granted === true ||
-        settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
-      ) {
-        Notifications.requestPermissionsAsync({
-          ios: {
-            allowAlert: true,
-            allowBadge: true,
-            allowSound: true,
-            allowDisplayInCarPlay: true,
-            allowCriticalAlerts: true,
-            provideAppNotificationSettings: true,
-            allowProvisional: true,
-            allowAnnouncements: true,
-          },
-        }).then((permission) => {
-          if (permission.granted === false) {
-            Alert.alert('Notifications permission denied', JSON.stringify(permission));
-          }
-        });
-      }
-    });
-  }
+    if (
+      settings.granted === true ||
+      settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL
+    ) {
+      Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+          allowDisplayInCarPlay: true,
+          allowCriticalAlerts: true,
+          provideAppNotificationSettings: true,
+          allowProvisional: true,
+          allowAnnouncements: true,
+        },
+      }).then((permission) => {
+        if (permission.granted === false) {
+          Alert.alert('Notifications permission denied', JSON.stringify(permission));
+        }
+      });
+    }
+  });
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
@@ -87,7 +85,7 @@ export default function NotificationHandler() {
 
 async function registerForPushNotificationsAsync() {
   let token;
-  if (Constants.isDevice && Platform.OS !== 'web') {
+  if (Constants.isDevice) {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {

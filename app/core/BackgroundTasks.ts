@@ -13,8 +13,6 @@ import {
 } from './BackgroundLocationTask';
 
 export default function BackgroundTasks() {
-  const cloudSync = useStore((state) => state.cloudSync);
-  const loggedIn = useStore((state) => state.loggedIn);
   const session = useStore((state) => state.session);
 
   const getUnsyncedBookingsFromDB = async () => {
@@ -39,7 +37,7 @@ export default function BackgroundTasks() {
       await startBackgroundLocationTask();
     }
 
-    if (nextAppState === 'active' && cloudSync === true && loggedIn === true && session) {
+    if (nextAppState === 'active' && session) {
       const unsyncedBookings = await getUnsyncedBookingsFromDB();
       console.log(`unsyncedBookings`, unsyncedBookings);
     }

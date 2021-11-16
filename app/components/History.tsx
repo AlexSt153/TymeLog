@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import { Divider, Text, Surface, Colors, Card } from 'react-native-paper';
-import { executeSql, search } from 'expo-sqlite-query-helper';
 import ReverseGeocodeLocation from './ReverseGeocodeLocation';
 import { format } from 'date-fns';
+import { getAllBookings } from '../api/bookings';
+import { useStore } from '../store';
 
 const _ = require('lodash');
 
 export default function History({ lastBooking, refreshHistory }) {
   // let listViewRef;
   const [refreshing, setRefreshing] = useState(false);
-  const [bookings, setBookings] = useState([]);
+  const bookings = useStore((state) => state.bookings);
+  const setBookings = useStore((state) => state.setBookings);
 
   const { width } = useWindowDimensions();
 
@@ -28,20 +30,20 @@ export default function History({ lastBooking, refreshHistory }) {
     },
   });
 
-  const getBookingsFromDB = async () => {
+  const getBookings = async () => {
     setRefreshing(true);
-    const result = await executeSql(
-      'SELECT * FROM bookings WHERE type != "background" ORDER BY timestamp DESC'
-    );
-    // const result = await search('bookings', { type: 'background' }, { timestamp: 'DESC' });
 
-    if (Array.isArray(result.rows._array)) {
-      setBookings(result.rows._array);
+    const { bookings, error } = await getAllBookings();
+
+    if (error) {
+      console.log(error);
+    } else {
+      setBookings(bookings.reverse());
     }
   };
 
   useEffect(() => {
-    getBookingsFromDB();
+    getBookings();
   }, [lastBooking, refreshHistory]);
 
   useEffect(() => {
@@ -133,71 +135,75 @@ export default function History({ lastBooking, refreshHistory }) {
           inverted
           data={bookings}
           refreshing={refreshing}
-          onRefresh={() => getBookingsFromDB()}
+          onRefresh={() => getBookings()}
           keyExtractor={(item) => item.id.toString()}
           renderItem={(listItem) => {
-            const { item } = listItem;
-            const data = JSON.parse(item.data);
-            // console.log(`data`, data);
+            try {
+              const { item } = listItem;
+              const { location } = item;
 
-            if (item.type === 'background') return null;
+              if (item.type === 'background') return null;
 
-            const lastItem = bookings[listItem.index - 1];
+              const lastItem = bookings[listItem.index - 1];
 
-            if (!data.location) return null;
+              if (!location) return null;
 
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginBottom: 10,
-                  padding: 8,
-                  height: 60,
-                  width: '100%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  elevation: 4,
-                }}
-              >
-                <Surface
-                  style={{
-                    height: 30,
-                    width: 30,
-                    borderRadius: 15,
-                    marginRight: 10,
-                    backgroundColor: backgroundColor(item.type),
-                    borderColor: borderColor(item.type),
-                    borderWidth: 1,
-                  }}
-                >
-                  {_.has(lastItem, 'type') && connectLastItem(item)}
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      paddingTop: 2,
-                      color: textColor(item.type),
-                      textAlign: 'center',
-                      textAlignVertical: 'center',
-                    }}
-                  >
-                    {item.type[0].toUpperCase()}
-                  </Text>
-                </Surface>
+              return (
                 <View
                   style={{
-                    width: '80%',
-                    flexDirection: 'column',
-                    flexWrap: 'wrap',
+                    flexDirection: 'row',
+                    marginBottom: 10,
+                    padding: 8,
+                    height: 60,
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    elevation: 4,
                   }}
                 >
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text>{format(data.location.timestamp, 'HH:mm:ss')}</Text>
-                    <Text>{format(data.location.timestamp, 'dd.MM.yy')}</Text>
+                  <Surface
+                    style={{
+                      height: 30,
+                      width: 30,
+                      borderRadius: 15,
+                      marginRight: 10,
+                      backgroundColor: backgroundColor(item.type),
+                      borderColor: borderColor(item.type),
+                      borderWidth: 1,
+                    }}
+                  >
+                    {_.has(lastItem, 'type') && connectLastItem(item)}
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        paddingTop: 2,
+                        color: textColor(item.type),
+                        textAlign: 'center',
+                        textAlignVertical: 'center',
+                      }}
+                    >
+                      {item.type[0].toUpperCase()}
+                    </Text>
+                  </Surface>
+                  <View
+                    style={{
+                      width: '80%',
+                      flexDirection: 'column',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text>{item.timestamp}</Text>
+                      <Text>{item.timestamp}</Text>
+                    </View>
+                    <ReverseGeocodeLocation coords={location.coords} />
                   </View>
-                  <ReverseGeocodeLocation coords={data.location.coords} />
                 </View>
-              </View>
-            );
+              );
+            } catch (error) {
+              console.log(error);
+              return null;
+            }
           }}
           ItemSeparatorComponent={(props) => {
             if (props.leadingItem.type === 'background') return null;
