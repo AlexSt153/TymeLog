@@ -21,12 +21,12 @@ export default function Home({ navigation }) {
   const getBookings = async () => {
     setRefreshing(true);
 
-    const { bookings, error } = await getAllBookings();
+    const { data, error } = await supabase.from('bookings').select('*').neq('type', 'background');
 
     if (error) {
       console.log(error);
     } else {
-      setBookings(bookings.reverse());
+      setBookings(data);
       setRefreshing(false);
     }
   };

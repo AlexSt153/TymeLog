@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { useStore } from '../store';
 import { getAllBookings } from '../api/bookings';
 import moment from 'moment';
+import { supabase } from '../../lib/supabase';
 
 const styles = StyleSheet.create({
   container: {
@@ -63,11 +64,11 @@ export default function Map({ navigation }) {
   }, []);
 
   const getBookingsFromDB = async () => {
-    const { bookings, error } = await getAllBookings();
+    const { data, error } = await supabase.from('bookings').select('*').eq('type', 'background');
     if (error) {
       console.log(error);
     } else {
-      setBookings(bookings);
+      setBookings(data);
     }
   };
 

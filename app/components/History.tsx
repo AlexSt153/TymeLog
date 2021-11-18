@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import { Divider, Text, Surface, Colors, Card } from 'react-native-paper';
 import moment from 'moment';
@@ -6,7 +6,80 @@ import AddressLine from './AddressLine';
 
 const _ = require('lodash');
 
+const backgroundColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
+
+const textColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green100;
+    case 'pause':
+      return Colors.blue100;
+    case 'end':
+      return Colors.red100;
+    default:
+      return null;
+  }
+};
+
+const borderColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
+
+const lineColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
+
+const connectLastItem = (item) => {
+  if (item.type === 'end') return null;
+
+  return (
+    <Surface
+      style={{
+        position: 'absolute',
+        left: 12.5,
+        bottom: -42,
+        height: 40,
+        width: 2,
+        elevation: 4,
+        backgroundColor: lineColor(item.type),
+      }}
+    >
+      <View />
+    </Surface>
+  );
+};
+
 export default function History({ bookings, getBookings, refreshing }) {
+  const flatListRef = useRef(null);
   const { width } = useWindowDimensions();
 
   const styles = StyleSheet.create({
@@ -23,85 +96,29 @@ export default function History({ bookings, getBookings, refreshing }) {
     },
   });
 
-  const backgroundColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
+  useEffect(() => {
+    try {
+      if (flatListRef.current) {
+        flatListRef.current.scrollToEnd({ animated: true });
+      }
+    } catch (error) {
+      console.log(error);
     }
-  };
+  }, [bookings]);
 
-  const textColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green100;
-      case 'pause':
-        return Colors.blue100;
-      case 'end':
-        return Colors.red100;
-      default:
-        return null;
-    }
-  };
-
-  const borderColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
-    }
-  };
-
-  const lineColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
-    }
-  };
-
-  const connectLastItem = (item) => {
-    if (item.type === 'end') return null;
-
-    return (
-      <Surface
-        style={{
-          position: 'absolute',
-          left: 12.5,
-          bottom: -42,
-          height: 40,
-          width: 2,
-          elevation: 4,
-          backgroundColor: lineColor(item.type),
-        }}
-      >
-        <View />
-      </Surface>
-    );
-  };
+  const ITEM_HEIGHT = 80;
 
   return (
     <Card style={styles.container}>
       {bookings.length > 0 ? (
         <FlatList
+          ref={flatListRef}
           style={{ flex: 1, width: '100%' }}
-          inverted
           data={bookings}
+          initialScrollIndex={bookings.length - 1}
+          getItemLayout={(data, index) => {
+            return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
+          }}
           refreshing={refreshing}
           onRefresh={() => getBookings()}
           keyExtractor={(item) => item.id.toString()}
@@ -110,9 +127,7 @@ export default function History({ bookings, getBookings, refreshing }) {
               const { item } = listItem;
               const { location } = item;
 
-              if (item.type === 'background') return null;
-
-              const lastItem = bookings[listItem.index - 1];
+              const nextItem = bookings[listItem.index + 1];
 
               if (!location) return null;
 
@@ -140,7 +155,7 @@ export default function History({ bookings, getBookings, refreshing }) {
                       borderWidth: 1,
                     }}
                   >
-                    {_.has(lastItem, 'type') && connectLastItem(item)}
+                    {_.has(nextItem, 'type') && connectLastItem(item)}
                     <Text
                       style={{
                         fontSize: 20,
