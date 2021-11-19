@@ -2,11 +2,6 @@ import { supabase } from '../../lib/supabase';
 import { getCoordsResultFromCache } from './location';
 import { LocationObject } from 'expo-location';
 
-export const getAllBookings = async () => {
-  const { data: bookings, error } = await supabase.from('bookings').select('*');
-  return { bookings, error };
-};
-
 interface InsertBookingProps {
   user_id: string;
   location: LocationObject;

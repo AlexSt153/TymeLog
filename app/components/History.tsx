@@ -125,11 +125,7 @@ export default function History({ bookings, getBookings, refreshing }) {
           renderItem={(listItem) => {
             try {
               const { item } = listItem;
-              const { location } = item;
-
               const nextItem = bookings[listItem.index + 1];
-
-              if (!location) return null;
 
               return (
                 <View

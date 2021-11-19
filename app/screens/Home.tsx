@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import moment from 'moment';
 import { useStore } from '../store';
 import History from '../components/History';
-import { getAllBookings, insertBookings } from '../api/bookings';
+import { insertBookings } from '../api/bookings';
 import { deviceOS, isIOS } from '../tools/deviceInfo';
 import BookingButtons from '../components/BookingButtons';
 import { supabase } from '../../lib/supabase';
@@ -21,7 +21,11 @@ export default function Home({ navigation }) {
   const getBookings = async () => {
     setRefreshing(true);
 
-    const { data, error } = await supabase.from('bookings').select('*').neq('type', 'background');
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .range(0, 100)
+      .neq('type', 'background');
 
     if (error) {
       console.log(error);
@@ -33,16 +37,7 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     Location.requestForegroundPermissionsAsync().then((status) => setForegroundPermission(status));
-    const bookingChangeSubscription = supabase
-      .from('bookings')
-      .on('*', () => {
-        getBookings();
-      })
-      .subscribe();
-
-    return () => {
-      bookingChangeSubscription.unsubscribe();
-    };
+    getBookings();
   }, []);
 
   useEffect(() => {
