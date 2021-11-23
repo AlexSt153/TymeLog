@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Card, List } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -11,6 +13,7 @@ import { format } from 'date-fns';
 import { useStore } from '../store';
 import moment from 'moment';
 import { supabase } from '../../lib/supabase';
+import { FlatList } from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   container: {
@@ -35,9 +38,7 @@ export default function Map({ navigation }) {
 
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(new Date(paramDate));
-
-  const [startDateText, setStartDateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
-  const [endDateText, setEndDateText] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
+  const [dateText, setdateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
 
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
@@ -61,7 +62,7 @@ export default function Map({ navigation }) {
 
   const mapRef = useRef<MapView>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['10%', '90%'], []);
+  const snapPoints = useMemo(() => ['14%', '90%'], []);
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
@@ -70,8 +71,8 @@ export default function Map({ navigation }) {
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
-      // .eq('type', 'background')
-      .like('timestamp', `${moment(paramDate).format('YYYY-MM-DD%')}`);
+      .eq('type', 'background')
+      .like('timestamp', `${moment(date).format('YYYY-MM-DD%')}`);
     if (error) {
       console.log(error);
     } else {
@@ -122,8 +123,8 @@ export default function Map({ navigation }) {
 
   useEffect(() => {
     if (date) {
-      setStartDateText(format(date, 'yyyy-MM-dd 00:00:00'));
-      setEndDateText(format(date, 'yyyy-MM-dd 23:59:59'));
+      setdateText(format(date, 'yyyy-MM-dd 00:00:00'));
+      getBookingsFromDB();
     }
   }, [date]);
 
@@ -169,9 +170,67 @@ export default function Map({ navigation }) {
         backgroundStyle={{ backgroundColor: colors.background }}
       >
         <View style={styles.contentContainer}>
-          <Text style={{ marginTop: 10 }} onPress={() => setOpen(true)}>
-            {moment(startDateText).format('yyyy-MM-DD')}
-          </Text>
+          <Card
+            style={{
+              width: '90%',
+            }}
+          >
+            <View
+              style={{
+                height: 50,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-around',
+              }}
+            >
+              <Ionicons
+                name="ios-arrow-back"
+                size={24}
+                color={colors.text}
+                onPress={() => {
+                  setDate(new Date(moment(date).subtract(1, 'day').format()));
+                }}
+              />
+              <Text onPress={() => setOpen(true)}>{moment(dateText).format('YYYY-MM-DD')}</Text>
+              <Ionicons
+                name="ios-arrow-forward"
+                size={24}
+                color={colors.text}
+                onPress={() => {
+                  setDate(new Date(moment(date).add(1, 'day').format()));
+                }}
+              />
+            </View>
+          </Card>
+          <FlatList
+            style={{
+              width: '100%',
+              marginTop: 20,
+              marginBottom: 20,
+            }}
+            data={bookings}
+            renderItem={({ item }) => (
+              <View style={{ width: '90%', alignSelf: 'center' }}>
+                <List.Item
+                  title={moment(item.timestamp).format('HH:mm')}
+                  description={item.type}
+                  left={(props) => (
+                    <MaterialCommunityIcons
+                      {...props}
+                      style={{
+                        alignSelf: 'center',
+                        marginRight: 20,
+                      }}
+                      name="map-marker-outline"
+                      size={24}
+                      color={colors.text}
+                    />
+                  )}
+                />
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
           <DatePickerModal
             mode="single"
             visible={open}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, FlatList, useWindowDimensions, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import { Text, Surface, Colors, Card } from 'react-native-paper';
 import moment from 'moment';
 import AddressLine from './AddressLine';
@@ -100,6 +100,10 @@ export default function History({ bookings, getNextBookings, refreshing }) {
 
   useEffect(() => {
     try {
+      // console.log('bookings[-1] :>> ', bookings[-1]);
+      // console.log('bookings[0] :>> ', bookings[0]);
+      // console.log('bookings[1] :>> ', bookings[1]);
+
       if (flatListRef.current) {
         flatListRef.current.scrollToEnd({ animated: true });
       }
@@ -126,86 +130,104 @@ export default function History({ bookings, getNextBookings, refreshing }) {
             onRefresh={() => getNextBookings(100)}
             keyExtractor={(item) => item.id.toString()}
             renderItem={(listItem) => {
+              const { item } = listItem;
+              let lastItem = null;
+              let nextItem = null;
+              let header = null;
+
               try {
-                const { item } = listItem;
-                const lastItem = bookings[listItem.index - 1];
-                const nextItem = bookings[listItem.index + 1];
+                lastItem = bookings[listItem.index - 1];
+              } catch (error) {
+                console.log('error create lastItem', error);
+              }
 
-                let header = null;
-                try {
-                  if (lastItem.type === 'end') {
-                    const dayBookings = _.filter(bookings, (booking) => {
-                      return moment(booking.timestamp).isSame(
-                        moment(item.timestamp).format('YYYY-MM-DD'),
-                        'day'
-                      );
-                    });
+              try {
+                nextItem = bookings[listItem.index + 1];
+              } catch (error) {
+                console.log('error create nextItem', error);
+              }
 
-                    header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
-                  }
-                } catch (error) {
-                  console.log(error);
+              try {
+                if (lastItem === undefined) {
+                  const dayBookings = _.filter(bookings, (booking) => {
+                    return moment(booking.timestamp).isSame(
+                      moment(item.timestamp).format('YYYY-MM-DD'),
+                      'day'
+                    );
+                  });
+
+                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
                 }
 
-                return (
-                  <>
-                    {header}
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        marginBottom: 10,
-                        padding: 8,
-                        height: 60,
-                        width: '100%',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        elevation: 4,
-                      }}
-                    >
-                      <Surface
-                        style={{
-                          height: 30,
-                          width: 30,
-                          borderRadius: 15,
-                          marginRight: 10,
-                          backgroundColor: backgroundColor(item.type),
-                          borderColor: borderColor(item.type),
-                          borderWidth: 1,
-                        }}
-                      >
-                        {_.has(nextItem, 'type') && connectLastItem(item)}
-                        <Text
-                          style={{
-                            fontSize: 20,
-                            paddingTop: 2,
-                            color: textColor(item.type),
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-                          }}
-                        >
-                          {item.type[0].toUpperCase()}
-                        </Text>
-                      </Surface>
-                      <View
-                        style={{
-                          width: '80%',
-                          flexDirection: 'column',
-                          marginTop: 10,
-                        }}
-                      >
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                          <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
-                          <Text>{moment(item.timestamp).format('DD.MM.YY')}</Text>
-                        </View>
-                        <AddressLine address={item.address} />
-                      </View>
-                    </View>
-                  </>
-                );
+                if (lastItem.type === 'end') {
+                  const dayBookings = _.filter(bookings, (booking) => {
+                    return moment(booking.timestamp).isSame(
+                      moment(item.timestamp).format('YYYY-MM-DD'),
+                      'day'
+                    );
+                  });
+
+                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
+                }
               } catch (error) {
                 console.log(error);
-                return null;
               }
+
+              return (
+                <>
+                  {header}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginBottom: 10,
+                      padding: 8,
+                      height: 60,
+                      width: '100%',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      elevation: 4,
+                    }}
+                  >
+                    <Surface
+                      style={{
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                        marginRight: 10,
+                        backgroundColor: backgroundColor(item.type),
+                        borderColor: borderColor(item.type),
+                        borderWidth: 1,
+                      }}
+                    >
+                      {_.has(nextItem, 'type') && connectLastItem(item)}
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          paddingTop: 2,
+                          color: textColor(item.type),
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+                        }}
+                      >
+                        {item.type[0].toUpperCase()}
+                      </Text>
+                    </Surface>
+                    <View
+                      style={{
+                        width: '80%',
+                        flexDirection: 'column',
+                        marginTop: 10,
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
+                        <Text>{moment(item.timestamp).format('DD.MM.YY')}</Text>
+                      </View>
+                      <AddressLine address={item.address} />
+                    </View>
+                  </View>
+                </>
+              );
             }}
           />
         </WebFlatListWrapper>

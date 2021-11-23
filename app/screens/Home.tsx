@@ -22,9 +22,6 @@ export default function Home({ navigation }) {
   const [lastBookingType, setLastBookingType] = useState('');
   const [ForegroundPermission, setForegroundPermission] = useState({ status: 'unknown' });
 
-  const [rangeStart, setRangeStart] = useState(0);
-  const [rangeEnd, setRangeEnd] = useState(100);
-
   const getBookings = async () => {
     setRefreshing(true);
 
@@ -49,7 +46,7 @@ export default function Home({ navigation }) {
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
-      .range(rangeStart + 1 + offset, rangeEnd + offset)
+      .range(1 + offset, 100 + offset)
       .neq('type', 'background')
       .order('timestamp', { ascending: true });
 

@@ -10672,6 +10672,11 @@ react-native-screens@~3.4.0:
   dependencies:
     warn-once "^0.1.0"
 
+react-native-swipeable-item@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-swipeable-item/-/react-native-swipeable-item-2.0.1.tgz#12d7775014ef60f0f455d116e75b77d24523d048"
+  integrity sha512-RkhnVdMzYUgZeYlnzkfog7m2C0OOhqD6H5D6g6Y8T5MHc2DGm2/Gs4XrM1NjFWcKOKP+6aHkn1POpjgJ8Q8BLg==
+
 react-native-url-polyfill@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/react-native-url-polyfill/-/react-native-url-polyfill-1.3.0.tgz#c1763de0f2a8c22cc3e959b654c8790622b6ef6a"
