@@ -1,136 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, useWindowDimensions } from 'react-native';
-import { IconButton, Colors, Card, Text } from 'react-native-paper';
-import Database, { insert } from 'expo-sqlite-query-helper';
+import { SafeAreaView, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from 'react-native-paper';
 import * as Location from 'expo-location';
+import moment from 'moment';
 import { useStore } from '../store';
 import History from '../components/History';
-import { createBookingsTable } from '../database';
+import { insertBookings } from '../api/bookings';
+import { deviceOS, isIOS } from '../tools/deviceInfo';
+import BookingButtons from '../components/BookingButtons';
+import { supabase } from '../../lib/supabase';
 
 export default function Home({ navigation }) {
-  const lastBooking = useStore((state) => state.lastBooking);
-  const setLastBooking = useStore((state) => state.setLastBooking);
-  const [refreshHistory, setRefreshHistory] = useState(false);
+  const { colors } = useTheme();
+
+  const session = useStore((state) => state.session);
+  const bookings = useStore((state) => state.bookings);
+  const setBookings = useStore((state) => state.setBookings);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastBookingType, setLastBookingType] = useState('');
   const [ForegroundPermission, setForegroundPermission] = useState({ status: 'unknown' });
 
-  const { width, height } = useWindowDimensions();
+  const getBookings = async () => {
+    setRefreshing(true);
 
-  Database('tymelog.db');
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .range(0, 100)
+      .neq('type', 'background')
+      .order('timestamp', { ascending: true });
+
+    if (error) {
+      console.log(error);
+    } else {
+      setBookings(data);
+      setRefreshing(false);
+    }
+  };
+
+  const getNextBookings = async (offset: number) => {
+    setRefreshing(true);
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .range(1 + offset, 100 + offset)
+      .neq('type', 'background')
+      .order('timestamp', { ascending: true });
+
+    if (error) {
+      console.log(error);
+    } else {
+      setBookings(bookings.concat(data));
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    createBookingsTable();
     Location.requestForegroundPermissionsAsync().then((status) => setForegroundPermission(status));
+    getBookings();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      // Screen was focused
-      setRefreshHistory((prevState) => !prevState);
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const insertBooking = async (type) => {
+  const addBooking = async (type: string) => {
     console.log('type', type);
 
-    // if (ForegroundPermission.status === 'granted') {
-    const location = await Location.getLastKnownPositionAsync();
-    // if (location !== null) {
+    let location = null;
+    if (isIOS) {
+      location = await Location.getLastKnownPositionAsync();
+    } else {
+      location = await Location.getCurrentPositionAsync({});
+    }
     console.log('location :>> ', location);
 
-    setLastBooking({
-      type,
-      timestamp: Date.now(),
-      data: JSON.stringify({ location }),
-    });
+    setLastBookingType(type);
 
-    insert('bookings', [
+    const { data, error } = await insertBookings([
       {
+        user_id: session.user.id,
         type,
-        data: JSON.stringify({ location }),
+        location,
+        timestamp: moment().format(),
+        origin: deviceOS,
       },
-    ])
-      .then(({ rowAffected, lastQuery }) => {
-        console.log('insertBooking success', rowAffected, lastQuery);
-      })
-      .catch((e) => console.log(e));
-    // }
-    // }
+    ]);
+    console.log('insert supabase', { data, error });
+
+    getBookings();
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* <Card
-        style={{
-          height: height * 0.2,
-          marginTop: 10,
-          marginHorizontal: 10,
-          padding: height * 0.08,
-          alignItems: 'center',
-        }}
-      >
-        <Text>Charts maybe?</Text>
-      </Card> */}
-      <History lastBooking={lastBooking} refreshHistory={refreshHistory} />
-      <View
-        style={{
-          // position: 'absolute',
-          marginBottom: 10,
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'space-evenly',
-        }}
-      >
-        <Card
-          style={{
-            backgroundColor: Colors.green600,
-            flex: 0.3,
-            alignItems: 'center',
-            // borderRadius: 100,
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 15 }}>
+        <Ionicons
+          name={'settings'}
+          size={25}
+          color={colors.text}
+          onPress={() => {
+            navigation.navigate('Settings');
           }}
-        >
-          <IconButton
-            disabled={lastBooking.type === 'start'}
-            icon="play-circle-outline"
-            size={30}
-            color={Colors.green100}
-            onPress={() => insertBooking('start')}
-          />
-        </Card>
-        <Card
-          style={{
-            backgroundColor: Colors.blue600,
-            flex: 0.3,
-            alignItems: 'center',
-            // borderRadius: 100,
+        />
+        <Ionicons
+          name={'refresh'}
+          size={25}
+          color={colors.text}
+          onPress={() => {
+            getBookings();
           }}
-        >
-          <IconButton
-            disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
-            icon="pause-circle-outline"
-            size={30}
-            color={Colors.blue100}
-            onPress={() => insertBooking('pause')}
-          />
-        </Card>
-        <Card
-          style={{
-            backgroundColor: Colors.red600,
-            flex: 0.3,
-            alignItems: 'center',
-            // borderRadius: 100,
-          }}
-        >
-          <IconButton
-            disabled={lastBooking.type === 'pause' || lastBooking.type === 'end'}
-            icon="stop-circle-outline"
-            size={30}
-            color={Colors.red100}
-            onPress={() => insertBooking('end')}
-          />
-        </Card>
+        />
       </View>
+      <History bookings={bookings} getNextBookings={getNextBookings} refreshing={refreshing} />
+      <BookingButtons addBooking={addBooking} lastBookingType={lastBookingType} />
     </SafeAreaView>
   );
 }

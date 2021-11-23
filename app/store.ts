@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Session } from '@supabase/supabase-js';
 
 type lastBooking = {
   type: string;
@@ -9,21 +10,12 @@ type lastBooking = {
 };
 
 type MainState = {
-  loggedIn: boolean;
-  logIn: () => void;
-  logOut: () => void;
-  session: object;
-  setSession: (session: object) => void;
+  session: Session | null;
+  setSession: (session: Session | object) => void;
   theme: string;
   setTheme: (theme: string) => void;
-  lockSettings: boolean;
-  setLockSettings: (lockSettings: boolean) => void;
-  encryption: boolean;
-  setEncryption: (encryption: boolean) => void;
-  masterpwd: string;
-  setMasterpwd: (masterpwd: string) => void;
-  cloudSync: boolean;
-  setCloudSync: (cloudSync: boolean) => void;
+  bookings: any;
+  setBookings: (bookings: any) => void;
   lastBooking: lastBooking;
   setLastBooking: (lastBooking: lastBooking) => void;
   regions: Array<object>;
@@ -33,21 +25,12 @@ type MainState = {
 export const useStore = create<MainState>(
   persist(
     (set) => ({
-      loggedIn: false,
-      logIn: () => set(() => ({ loggedIn: true })),
-      logOut: () => set(() => ({ loggedIn: false })),
-      session: {},
-      setSession: (session) => set(() => ({ session })),
+      session: null,
+      setSession: (session: Session) => set(() => ({ session })),
       theme: 'system',
       setTheme: (theme) => set(() => ({ theme })),
-      lockSettings: false,
-      setLockSettings: (lockSettings) => set(() => ({ lockSettings })),
-      encryption: false,
-      setEncryption: (encryption) => set(() => ({ encryption })),
-      masterpwd: '',
-      setMasterpwd: (masterpwd) => set(() => ({ masterpwd })),
-      cloudSync: true,
-      setCloudSync: (cloudSync) => set(() => ({ cloudSync })),
+      bookings: [],
+      setBookings: (bookings) => set(() => ({ bookings })),
       lastBooking: { type: '', timestamp: 0, data: '' },
       setLastBooking: (lastBooking) => set(() => ({ lastBooking })),
       regions: [],

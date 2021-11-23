@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { signInUser, supabase } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { useStore } from '../store';
 
 const styles = StyleSheet.create({
@@ -15,9 +15,7 @@ const styles = StyleSheet.create({
 export default function SignIn() {
   const navigation = useNavigation();
 
-  const logIn = useStore((state) => state.logIn);
   const setSession = useStore((state) => state.setSession);
-  const setCloudSync = useStore((state) => state.setCloudSync);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,8 +34,6 @@ export default function SignIn() {
       const session = supabase.auth.session();
 
       setSession(session);
-      setCloudSync(true);
-      logIn();
     }
   };
 
@@ -81,19 +77,6 @@ export default function SignIn() {
           </Button>
         </View>
       </KeyboardAvoidingView>
-      <View
-        style={[styles.container, { marginTop: 25, height: 100, justifyContent: 'space-evenly' }]}
-      >
-        <Text>OR</Text>
-        <Button
-          onPress={() => {
-            setCloudSync(false);
-            logIn();
-          }}
-        >
-          use App in offline mode
-        </Button>
-      </View>
     </View>
   );
 }

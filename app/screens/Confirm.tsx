@@ -9,9 +9,7 @@ export default function Confirm() {
   const route: RouteProp<{ params: { email: string; password: string } }, 'params'> = useRoute();
   const { email, password } = route.params;
 
-  const logIn = useStore((state) => state.logIn);
   const setSession = useStore((state) => state.setSession);
-  const setCloudSync = useStore((state) => state.setCloudSync);
   const [errorMessage, setErrorMessage] = useState('');
 
   const tryLogIn = async () => {
@@ -22,8 +20,6 @@ export default function Confirm() {
       const session = supabase.auth.session();
 
       setSession(session);
-      setCloudSync(true);
-      logIn();
     }
 
     if (error) {

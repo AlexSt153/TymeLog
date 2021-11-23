@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Card, List } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { search, executeSql } from 'expo-sqlite-query-helper';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useRoute } from '@react-navigation/native';
 import { useTheme as usePaperTheme } from 'react-native-paper';
 import { format } from 'date-fns';
 import { useStore } from '../store';
+import moment from 'moment';
+import { supabase } from '../../lib/supabase';
+import { FlatList } from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   container: {
@@ -28,18 +32,18 @@ const styles = StyleSheet.create({
 });
 
 export default function Map({ navigation }) {
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const route = useRoute();
+  // @ts-ignore
+  const { date: paramDate } = route.params;
 
-  const [startDateText, setStartDateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
-  const [endDateText, setEndDateText] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
+  const [open, setOpen] = React.useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(new Date(paramDate));
+  const [dateText, setdateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
 
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [region, setRegion] = useState(null);
   const regions = useStore((state) => state.regions);
-
-  // console.log('regions', regions);
 
   const { dark } = useTheme();
   const { colors } = usePaperTheme();
@@ -56,36 +60,23 @@ export default function Map({ navigation }) {
     [setOpen, setDate]
   );
 
+  const mapRef = useRef<MapView>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['10%', '90%'], []);
+  const snapPoints = useMemo(() => ['14%', '90%'], []);
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
 
   const getBookingsFromDB = async () => {
-    // const result = await search('bookings', { timestamp: { $gt: 0 } });
-
-    const result = await executeSql(
-      `SELECT * FROM bookings WHERE timestamp BETWEEN '${startDateText}' AND '${endDateText}'`
-    );
-
-    console.log('result :>> ', result);
-
-    if (Array.isArray(result.rows._array)) {
-      setBookings(result.rows._array);
-
-      const arrayLength = result.rows._array.length;
-      if (arrayLength > 0) {
-        const { data } = result.rows._array[arrayLength - 1];
-        const dataJSON = JSON.parse(data);
-
-        setRegion({
-          latitude: dataJSON.location?.coords?.latitude,
-          latitudeDelta: 0.054351194827738425,
-          longitude: dataJSON.location?.coords?.longitude,
-          longitudeDelta: 0.028632897433652715,
-        });
-      }
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('type', 'background')
+      .like('timestamp', `${moment(date).format('YYYY-MM-DD%')}`);
+    if (error) {
+      console.log(error);
+    } else {
+      setBookings(data);
     }
   };
 
@@ -100,15 +91,19 @@ export default function Map({ navigation }) {
   useEffect(() => {
     const bookingMarkers = [];
 
-    bookings.forEach((item) => {
-      const data = JSON.parse(item.data);
+    bookings.forEach((booking) => {
+      try {
+        const { location } = booking;
 
-      if (data.location) {
-        bookingMarkers.push({
-          latlng: data.location.coords,
-          title: item.id.toString(),
-          description: item.timestamp,
-        });
+        if (location) {
+          bookingMarkers.push({
+            latlng: location.coords,
+            title: booking.id.toString(),
+            description: booking.timestamp,
+          });
+        }
+      } catch (error) {
+        console.warn(error);
       }
     });
 
@@ -116,15 +111,27 @@ export default function Map({ navigation }) {
   }, [bookings]);
 
   useEffect(() => {
+    if (markers.length > 0) {
+      const coords = markers.map((marker) => marker.latlng);
+
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        animated: true,
+      });
+    }
+  }, [markers]);
+
+  useEffect(() => {
     if (date) {
-      setStartDateText(format(date, 'yyyy-MM-dd 00:00:00'));
-      setEndDateText(format(date, 'yyyy-MM-dd 23:59:59'));
+      setdateText(format(date, 'yyyy-MM-dd 00:00:00'));
+      getBookingsFromDB();
     }
   }, [date]);
 
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         onUserLocationChange={(event) => {
           getBookingsFromDB();
         }}
@@ -163,8 +170,67 @@ export default function Map({ navigation }) {
         backgroundStyle={{ backgroundColor: colors.background }}
       >
         <View style={styles.contentContainer}>
-          <Text onPress={() => setOpen(true)}>{startDateText}</Text>
-          <Text onPress={() => setOpen(true)}>{endDateText}</Text>
+          <Card
+            style={{
+              width: '90%',
+            }}
+          >
+            <View
+              style={{
+                height: 50,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-around',
+              }}
+            >
+              <Ionicons
+                name="ios-arrow-back"
+                size={24}
+                color={colors.text}
+                onPress={() => {
+                  setDate(new Date(moment(date).subtract(1, 'day').format()));
+                }}
+              />
+              <Text onPress={() => setOpen(true)}>{moment(dateText).format('YYYY-MM-DD')}</Text>
+              <Ionicons
+                name="ios-arrow-forward"
+                size={24}
+                color={colors.text}
+                onPress={() => {
+                  setDate(new Date(moment(date).add(1, 'day').format()));
+                }}
+              />
+            </View>
+          </Card>
+          <FlatList
+            style={{
+              width: '100%',
+              marginTop: 20,
+              marginBottom: 20,
+            }}
+            data={bookings}
+            renderItem={({ item }) => (
+              <View style={{ width: '90%', alignSelf: 'center' }}>
+                <List.Item
+                  title={moment(item.timestamp).format('HH:mm')}
+                  description={item.type}
+                  left={(props) => (
+                    <MaterialCommunityIcons
+                      {...props}
+                      style={{
+                        alignSelf: 'center',
+                        marginRight: 20,
+                      }}
+                      name="map-marker-outline"
+                      size={24}
+                      color={colors.text}
+                    />
+                  )}
+                />
+              </View>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+          />
           <DatePickerModal
             mode="single"
             visible={open}

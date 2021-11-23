@@ -1,17 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
-import { Divider, Text, Surface, Colors, Card } from 'react-native-paper';
-import { executeSql, search } from 'expo-sqlite-query-helper';
-import ReverseGeocodeLocation from './ReverseGeocodeLocation';
-import { format } from 'date-fns';
+import { Text, Surface, Colors, Card } from 'react-native-paper';
+import moment from 'moment';
+import AddressLine from './AddressLine';
+import BookingHeader from './BookingHeader';
+import WebFlatListWrapper from '../tools/WebFlatListWrapper';
 
 const _ = require('lodash');
 
-export default function History({ lastBooking, refreshHistory }) {
-  // let listViewRef;
-  const [refreshing, setRefreshing] = useState(false);
-  const [bookings, setBookings] = useState([]);
+const backgroundColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
 
+const textColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green100;
+    case 'pause':
+      return Colors.blue100;
+    case 'end':
+      return Colors.red100;
+    default:
+      return null;
+  }
+};
+
+const borderColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
+
+const lineColor = (type) => {
+  switch (type) {
+    case 'start':
+      return Colors.green600;
+    case 'pause':
+      return Colors.blue600;
+    case 'end':
+      return Colors.red600;
+    default:
+      return null;
+  }
+};
+
+const connectLastItem = (item) => {
+  if (item.type === 'end') return null;
+
+  return (
+    <Surface
+      style={{
+        position: 'absolute',
+        left: 12.5,
+        bottom: -42,
+        height: 40,
+        width: 2,
+        elevation: 4,
+        backgroundColor: lineColor(item.type),
+      }}
+    >
+      <View />
+    </Surface>
+  );
+};
+
+export default function History({ bookings, getNextBookings, refreshing }) {
+  const flatListRef = useRef(null);
   const { width } = useWindowDimensions();
 
   const styles = StyleSheet.create({
@@ -28,185 +98,139 @@ export default function History({ lastBooking, refreshHistory }) {
     },
   });
 
-  const getBookingsFromDB = async () => {
-    setRefreshing(true);
-    const result = await executeSql(
-      'SELECT * FROM bookings WHERE type != "background" ORDER BY timestamp DESC'
-    );
-    // const result = await search('bookings', { type: 'background' }, { timestamp: 'DESC' });
+  useEffect(() => {
+    try {
+      // console.log('bookings[-1] :>> ', bookings[-1]);
+      // console.log('bookings[0] :>> ', bookings[0]);
+      // console.log('bookings[1] :>> ', bookings[1]);
 
-    if (Array.isArray(result.rows._array)) {
-      setBookings(result.rows._array);
+      if (flatListRef.current) {
+        flatListRef.current.scrollToEnd({ animated: true });
+      }
+    } catch (error) {
+      console.log(error);
     }
-  };
-
-  useEffect(() => {
-    getBookingsFromDB();
-  }, [lastBooking, refreshHistory]);
-
-  useEffect(() => {
-    console.log(`bookings`, bookings);
-    setRefreshing(false);
-    // if (listViewRef) listViewRef.scrollToEnd({ animated: true });
   }, [bookings]);
 
-  const backgroundColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
-    }
-  };
-
-  const textColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green100;
-      case 'pause':
-        return Colors.blue100;
-      case 'end':
-        return Colors.red100;
-      default:
-        return null;
-    }
-  };
-
-  const borderColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
-    }
-  };
-
-  const lineColor = (type) => {
-    switch (type) {
-      case 'start':
-        return Colors.green600;
-      case 'pause':
-        return Colors.blue600;
-      case 'end':
-        return Colors.red600;
-      default:
-        return null;
-    }
-  };
-
-  const connectLastItem = (item) => {
-    if (item.type === 'end') return null;
-
-    return (
-      <Surface
-        style={{
-          position: 'absolute',
-          left: 12.5,
-          bottom: -42,
-          height: 40,
-          width: 2,
-          elevation: 4,
-          backgroundColor: lineColor(item.type),
-        }}
-      >
-        <View />
-      </Surface>
-    );
-  };
+  const ITEM_HEIGHT = 80;
 
   return (
     <Card style={styles.container}>
       {bookings.length > 0 ? (
-        <FlatList
-          // ref={(ref) => {
-          //   listViewRef = ref;
-          // }}
-          style={{ flex: 1, width: '100%' }}
-          inverted
-          data={bookings}
-          refreshing={refreshing}
-          onRefresh={() => getBookingsFromDB()}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={(listItem) => {
-            const { item } = listItem;
-            const data = JSON.parse(item.data);
-            // console.log(`data`, data);
+        <WebFlatListWrapper>
+          <FlatList
+            ref={flatListRef}
+            style={{ flex: 1, width: '100%' }}
+            data={bookings}
+            initialScrollIndex={bookings.length - 1}
+            getItemLayout={(data, index) => {
+              return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
+            }}
+            refreshing={refreshing}
+            onRefresh={() => getNextBookings(100)}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={(listItem) => {
+              const { item } = listItem;
+              let lastItem = null;
+              let nextItem = null;
+              let header = null;
 
-            if (item.type === 'background') return null;
+              try {
+                lastItem = bookings[listItem.index - 1];
+              } catch (error) {
+                console.log('error create lastItem', error);
+              }
 
-            const lastItem = bookings[listItem.index - 1];
+              try {
+                nextItem = bookings[listItem.index + 1];
+              } catch (error) {
+                console.log('error create nextItem', error);
+              }
 
-            if (!data.location) return null;
+              try {
+                if (lastItem === undefined) {
+                  const dayBookings = _.filter(bookings, (booking) => {
+                    return moment(booking.timestamp).isSame(
+                      moment(item.timestamp).format('YYYY-MM-DD'),
+                      'day'
+                    );
+                  });
 
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginBottom: 10,
-                  padding: 8,
-                  height: 60,
-                  width: '100%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  elevation: 4,
-                }}
-              >
-                <Surface
-                  style={{
-                    height: 30,
-                    width: 30,
-                    borderRadius: 15,
-                    marginRight: 10,
-                    backgroundColor: backgroundColor(item.type),
-                    borderColor: borderColor(item.type),
-                    borderWidth: 1,
-                  }}
-                >
-                  {_.has(lastItem, 'type') && connectLastItem(item)}
-                  <Text
+                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
+                }
+
+                if (lastItem.type === 'end') {
+                  const dayBookings = _.filter(bookings, (booking) => {
+                    return moment(booking.timestamp).isSame(
+                      moment(item.timestamp).format('YYYY-MM-DD'),
+                      'day'
+                    );
+                  });
+
+                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
+                }
+              } catch (error) {
+                console.log(error);
+              }
+
+              return (
+                <>
+                  {header}
+                  <View
                     style={{
-                      fontSize: 20,
-                      paddingTop: 2,
-                      color: textColor(item.type),
-                      textAlign: 'center',
-                      textAlignVertical: 'center',
+                      flexDirection: 'row',
+                      marginBottom: 10,
+                      padding: 8,
+                      height: 60,
+                      width: '100%',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      elevation: 4,
                     }}
                   >
-                    {item.type[0].toUpperCase()}
-                  </Text>
-                </Surface>
-                <View
-                  style={{
-                    width: '80%',
-                    flexDirection: 'column',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text>{format(data.location.timestamp, 'HH:mm:ss')}</Text>
-                    <Text>{format(data.location.timestamp, 'dd.MM.yy')}</Text>
+                    <Surface
+                      style={{
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                        marginRight: 10,
+                        backgroundColor: backgroundColor(item.type),
+                        borderColor: borderColor(item.type),
+                        borderWidth: 1,
+                      }}
+                    >
+                      {_.has(nextItem, 'type') && connectLastItem(item)}
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          paddingTop: 2,
+                          color: textColor(item.type),
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+                        }}
+                      >
+                        {item.type[0].toUpperCase()}
+                      </Text>
+                    </Surface>
+                    <View
+                      style={{
+                        width: '80%',
+                        flexDirection: 'column',
+                        marginTop: 10,
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
+                        <Text>{moment(item.timestamp).format('DD.MM.YY')}</Text>
+                      </View>
+                      <AddressLine address={item.address} />
+                    </View>
                   </View>
-                  <ReverseGeocodeLocation coords={data.location.coords} />
-                </View>
-              </View>
-            );
-          }}
-          ItemSeparatorComponent={(props) => {
-            if (props.leadingItem.type === 'background') return null;
-
-            return <Divider />;
-          }}
-          // ListHeaderComponent={() => <View style={{ height: 80 }} />}
-          // ListFooterComponent={() => <View style={{ height: 50 }} />}
-        />
+                </>
+              );
+            }}
+          />
+        </WebFlatListWrapper>
       ) : (
         <View
           style={{

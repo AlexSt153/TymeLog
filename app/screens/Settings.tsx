@@ -4,14 +4,13 @@ import { SafeAreaView, ScrollView, View, StyleSheet, Alert } from 'react-native'
 import { Button, List, Switch, Card } from 'react-native-paper';
 import { AnimatePresence, MotiView } from 'moti';
 import { useStore } from '../store';
-import { dropTable } from 'expo-sqlite-query-helper';
-import { createBookingsTable } from '../database';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import {
   BACKGROUND_LOCATION_TASK_NAME,
   GEOFENCING_TASK_NAME,
 } from '../core/BackgroundLocationTask';
+import { isNotWeb } from '../tools/deviceInfo';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,7 +19,7 @@ const styles = StyleSheet.create({
     margin: 10,
     paddingBottom: 20,
   },
-  indicator: { height: 30, width: 30, borderRadius: 15 },
+  indicator: { height: 25, width: 25, borderRadius: 15, alignSelf: 'center' },
   button: {},
   card: { paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5 },
 });
@@ -28,15 +27,8 @@ const styles = StyleSheet.create({
 export default function Settings({ navigation }) {
   const { dark } = useTheme();
 
-  const logOut = useStore((state) => state.logOut);
   const theme = useStore((state) => state.theme);
   const setTheme = useStore((state) => state.setTheme);
-  const lockSettings = useStore((state) => state.lockSettings);
-  const setLockSettings = useStore((state) => state.setLockSettings);
-  const encryption = useStore((state) => state.encryption);
-  const setEncryption = useStore((state) => state.setEncryption);
-  const cloudSync = useStore((state) => state.cloudSync);
-  const setCloudSync = useStore((state) => state.setCloudSync);
   const session = useStore((state) => state.session);
   const setSession = useStore((state) => state.setSession);
 
@@ -64,13 +56,15 @@ export default function Settings({ navigation }) {
         setHasNotificationPermission(permissions);
       });
 
-      Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
-        setHasGeofencingStarted(started);
-      });
+      if (isNotWeb) {
+        Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
+          setHasGeofencingStarted(started);
+        });
 
-      Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
-        setHasBackgroundLocationUpdates(started);
-      });
+        Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
+          setHasBackgroundLocationUpdates(started);
+        });
+      }
 
       console.log('session :>> ', session);
     });
@@ -211,34 +205,13 @@ export default function Settings({ navigation }) {
               )}
             </AnimatePresence>
           </Card>
-          <Card style={styles.card}>
-            <List.Subheader>GENERAL</List.Subheader>
-            <List.Item
-              title="Secure settings"
-              right={() => (
-                <Switch value={lockSettings} onValueChange={() => setLockSettings(!lockSettings)} />
-              )}
-            />
-            <List.Item
-              title="Encryption"
-              right={() => (
-                <Switch value={encryption} onValueChange={() => setEncryption(!encryption)} />
-              )}
-            />
-            <List.Item
-              title="Cloud Sync"
-              right={() => (
-                <Switch value={cloudSync} onValueChange={() => setCloudSync(!cloudSync)} />
-              )}
-            />
-          </Card>
         </List.Section>
         <View style={{ flexDirection: 'row' }}>
           <Button
             onPress={() => {
               Alert.alert(
-                'Delete local data',
-                'Are you sure you want purge all data from the datebase?',
+                'Logout',
+                'Are you sure you want to logout?',
                 [
                   {
                     text: 'Cancel',
@@ -248,8 +221,7 @@ export default function Settings({ navigation }) {
                   {
                     text: 'Yes!',
                     onPress: () => {
-                      dropTable('bookings');
-                      createBookingsTable();
+                      setSession(null);
                     },
                   },
                 ],
@@ -260,48 +232,8 @@ export default function Settings({ navigation }) {
             }}
             style={styles.button}
           >
-            Delete data
+            Logout
           </Button>
-          {Object.keys(session).length === 0 ? (
-            <Button
-              onPress={() => {
-                setSession({});
-                logOut();
-              }}
-              style={styles.button}
-            >
-              Login
-            </Button>
-          ) : (
-            <Button
-              onPress={() => {
-                Alert.alert(
-                  'Logout',
-                  'Are you sure you want to logout?',
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => console.log('Cancel Pressed'),
-                      style: 'cancel',
-                    },
-                    {
-                      text: 'Yes!',
-                      onPress: () => {
-                        setSession({});
-                        logOut();
-                      },
-                    },
-                  ],
-                  {
-                    cancelable: true,
-                  }
-                );
-              }}
-              style={styles.button}
-            >
-              Logout
-            </Button>
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>
