@@ -5,11 +5,10 @@ import { DatePickerModal } from 'react-native-paper-dates';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useRoute } from '@react-navigation/native';
 import { useTheme as usePaperTheme } from 'react-native-paper';
 import { format } from 'date-fns';
 import { useStore } from '../store';
-import { getAllBookings } from '../api/bookings';
 import moment from 'moment';
 import { supabase } from '../../lib/supabase';
 
@@ -30,14 +29,17 @@ const styles = StyleSheet.create({
 });
 
 export default function Map({ navigation }) {
+  const route = useRoute();
+  // @ts-ignore
+  const { date: paramDate } = route.params;
+
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [date, setDate] = React.useState<Date | undefined>(new Date(paramDate));
 
   const [startDateText, setStartDateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
   const [endDateText, setEndDateText] = useState(format(new Date(), 'yyyy-MM-dd 23:59:59'));
 
-  const bookings = useStore((state) => state.bookings);
-  const setBookings = useStore((state) => state.setBookings);
+  const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
   const [region, setRegion] = useState(null);
   const regions = useStore((state) => state.regions);
@@ -57,6 +59,7 @@ export default function Map({ navigation }) {
     [setOpen, setDate]
   );
 
+  const mapRef = useRef<MapView>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['10%', '90%'], []);
   const handleSheetChanges = useCallback((index: number) => {
@@ -64,7 +67,11 @@ export default function Map({ navigation }) {
   }, []);
 
   const getBookingsFromDB = async () => {
-    const { data, error } = await supabase.from('bookings').select('*').eq('type', 'background');
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      // .eq('type', 'background')
+      .like('timestamp', `${moment(paramDate).format('YYYY-MM-DD%')}`);
     if (error) {
       console.log(error);
     } else {
@@ -103,6 +110,17 @@ export default function Map({ navigation }) {
   }, [bookings]);
 
   useEffect(() => {
+    if (markers.length > 0) {
+      const coords = markers.map((marker) => marker.latlng);
+
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        animated: true,
+      });
+    }
+  }, [markers]);
+
+  useEffect(() => {
     if (date) {
       setStartDateText(format(date, 'yyyy-MM-dd 00:00:00'));
       setEndDateText(format(date, 'yyyy-MM-dd 23:59:59'));
@@ -112,6 +130,7 @@ export default function Map({ navigation }) {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         onUserLocationChange={(event) => {
           getBookingsFromDB();
         }}
