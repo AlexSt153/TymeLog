@@ -7,7 +7,7 @@ interface Coords {
 }
 
 export type Address = {
-  name: string;
+  street: string;
   city: string;
   country: string;
 };

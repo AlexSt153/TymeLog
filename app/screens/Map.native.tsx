@@ -115,7 +115,7 @@ export default function Map({ navigation }) {
       const coords = markers.map((marker) => marker.latlng);
 
       mapRef.current?.fitToCoordinates(coords, {
-        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        edgePadding: { top: 100, right: 100, bottom: 150, left: 100 },
         animated: true,
       });
     }
@@ -132,9 +132,9 @@ export default function Map({ navigation }) {
     <View style={styles.container}>
       <MapView
         ref={mapRef}
-        onUserLocationChange={(event) => {
-          getBookingsFromDB();
-        }}
+        // onUserLocationChange={(event) => {
+        //   getBookingsFromDB();
+        // }}
         // @ts-ignore
         userInterfaceStyle={dark ? 'dark' : 'light'}
         style={styles.map}

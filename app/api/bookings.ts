@@ -19,7 +19,7 @@ export const insertBookings = async (bookings: InsertBookingProps[]) => {
     bookings.map(async (booking) => {
       const { location } = booking;
       const address = await getCoordsResultFromCache(location.coords);
-      booking.address = `${address.name}, ${address.city}, ${address.country}`;
+      booking.address = `${address.street}, ${address.city}, ${address.country}`;
       return booking;
     })
   );

@@ -159,7 +159,10 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                   header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
                 }
 
-                if (lastItem.type === 'end') {
+                if (
+                  lastItem.type === 'end' &&
+                  !moment(lastItem.timestamp).isSame(item.timestamp, 'day')
+                ) {
                   const dayBookings = _.filter(bookings, (booking) => {
                     return moment(booking.timestamp).isSame(
                       moment(item.timestamp).format('YYYY-MM-DD'),
