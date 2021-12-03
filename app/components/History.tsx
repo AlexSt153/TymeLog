@@ -5,6 +5,7 @@ import moment from 'moment';
 import AddressLine from './AddressLine';
 import BookingHeader from './BookingHeader';
 import WebFlatListWrapper from '../tools/WebFlatListWrapper';
+import { isWeb } from '../tools/deviceInfo';
 
 const _ = require('lodash');
 
@@ -124,6 +125,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
             data={bookings}
             initialScrollIndex={bookings.length - 1}
             getItemLayout={(data, index) => {
+              if (isWeb) return null;
               return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
             }}
             refreshing={refreshing}
@@ -222,11 +224,12 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                         marginTop: 10,
                       }}
                     >
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <View style={{ flexDirection: 'row' }}>
                         <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
-                        <Text>{moment(item.timestamp).format('DD.MM.YY')}</Text>
                       </View>
-                      <AddressLine address={item.address} />
+                      <View style={{ flexDirection: 'row' }}>
+                        <AddressLine address={item.address} />
+                      </View>
                     </View>
                   </View>
                 </>
