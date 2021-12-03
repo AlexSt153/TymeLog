@@ -36,23 +36,25 @@ export default function Map({ navigation }) {
   // @ts-ignore
   const { date: paramDate } = route.params;
 
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(new Date(paramDate));
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(new Date(paramDate));
   const [dateText, setdateText] = useState(format(new Date(), 'yyyy-MM-dd 00:00:00'));
 
   const [bookings, setBookings] = useState([]);
   const [markers, setMarkers] = useState([]);
-  const [region, setRegion] = useState(null);
+
+  const initialRegion = useStore((state) => state.initialRegion);
+  const setInitialRegion = useStore((state) => state.setInitialRegion);
   const regions = useStore((state) => state.regions);
 
   const { dark } = useTheme();
   const { colors } = usePaperTheme();
 
-  const onDismissSingle = React.useCallback(() => {
+  const onDismissSingle = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
 
-  const onConfirmSingle = React.useCallback(
+  const onConfirmSingle = useCallback(
     (params) => {
       setOpen(false);
       setDate(params.date);
@@ -135,11 +137,15 @@ export default function Map({ navigation }) {
         // onUserLocationChange={(event) => {
         //   getBookingsFromDB();
         // }}
+        onRegionChangeComplete={(region) => {
+          setInitialRegion(region);
+        }}
         // @ts-ignore
         userInterfaceStyle={dark ? 'dark' : 'light'}
         style={styles.map}
         showsUserLocation
-        initialRegion={region}
+        initialRegion={initialRegion}
+        minZoomLevel={8}
       >
         {markers.map((marker, index) => (
           <Marker
