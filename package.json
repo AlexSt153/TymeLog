@@ -25,6 +25,7 @@
     "expo": "^44.0.0",
     "expo-application": "~4.0.1",
     "expo-constants": "~13.0.0",
+    "expo-dev-client": "~0.7.2",
     "expo-device": "~4.1.0",
     "expo-location": "~14.0.1",
     "expo-notifications": "~0.14.0",
