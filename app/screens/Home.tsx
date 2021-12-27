@@ -30,7 +30,7 @@ export default function Home({ navigation }) {
       .select('*')
       .range(0, 100)
       .neq('type', 'background')
-      .order('timestamp', { ascending: true });
+      .order('timestamp', { ascending: false });
 
     if (error) {
       console.log(error);
@@ -48,7 +48,7 @@ export default function Home({ navigation }) {
       .select('*')
       .range(1 + offset, 100 + offset)
       .neq('type', 'background')
-      .order('timestamp', { ascending: true });
+      .order('timestamp', { ascending: false });
 
     if (error) {
       console.log(error);

@@ -14,7 +14,7 @@ export const calculateMinutesWorked = (dayBookings: any[]): number => {
   let minutesWorked = 0;
 
   try {
-    dayBookings.forEach((booking, index) => {
+    dayBookings.reverse().forEach((booking, index) => {
       switch (booking.type) {
         case 'start':
           minutesWorked += moment(dayBookings[index + 1].timestamp).diff(

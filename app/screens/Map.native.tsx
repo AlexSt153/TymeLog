@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, Card, List } from 'react-native-paper';
+import { Text, Card } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { LocationRegion } from 'expo-location';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -14,6 +13,7 @@ import { useStore } from '../store';
 import moment from 'moment';
 import { supabase } from '../../lib/supabase';
 import { FlatList } from 'react-native-gesture-handler';
+import BackgroundItem from '../components/BackgroundItem';
 
 const styles = StyleSheet.create({
   container: {
@@ -215,26 +215,7 @@ export default function Map({ navigation }) {
               marginBottom: 20,
             }}
             data={bookings}
-            renderItem={({ item }) => (
-              <View style={{ width: '90%', alignSelf: 'center' }}>
-                <List.Item
-                  title={moment(item.timestamp).format('HH:mm')}
-                  description={item.type}
-                  left={(props) => (
-                    <MaterialCommunityIcons
-                      {...props}
-                      style={{
-                        alignSelf: 'center',
-                        marginRight: 20,
-                      }}
-                      name="map-marker-outline"
-                      size={24}
-                      color={colors.text}
-                    />
-                  )}
-                />
-              </View>
-            )}
+            renderItem={({ item }) => <BackgroundItem item={item} />}
             keyExtractor={(item) => item.id.toString()}
           />
           <DatePickerModal

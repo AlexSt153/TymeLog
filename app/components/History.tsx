@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, FlatList, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Text, Surface, Colors, Card } from 'react-native-paper';
 import moment from 'moment';
 import AddressLine from './AddressLine';
@@ -61,8 +61,8 @@ const lineColor = (type) => {
   }
 };
 
-const connectLastItem = (item) => {
-  if (item.type === 'end') return null;
+const connectNextItem = (nextItem) => {
+  if (nextItem.type === 'end') return null;
 
   return (
     <Surface
@@ -73,7 +73,7 @@ const connectLastItem = (item) => {
         height: 40,
         width: 2,
         elevation: 4,
-        backgroundColor: lineColor(item.type),
+        backgroundColor: lineColor(nextItem.type),
       }}
     >
       <View />
@@ -106,7 +106,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
       // console.log('bookings[1] :>> ', bookings[1]);
 
       if (flatListRef.current) {
-        flatListRef.current.scrollToEnd({ animated: true });
+        // flatListRef.current.scrollToEnd({ animated: true });
       }
     } catch (error) {
       console.log(error);
@@ -123,7 +123,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
             ref={flatListRef}
             style={{ flex: 1, width: '100%' }}
             data={bookings}
-            initialScrollIndex={bookings.length - 1}
+            // initialScrollIndex={bookings.length - 1}
             getItemLayout={(data, index) => {
               if (isWeb) return null;
               return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
@@ -162,7 +162,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                 }
 
                 if (
-                  lastItem.type === 'end' &&
+                  lastItem.type === 'start' &&
                   !moment(lastItem.timestamp).isSame(item.timestamp, 'day')
                 ) {
                   const dayBookings = _.filter(bookings, (booking) => {
@@ -181,7 +181,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
               return (
                 <>
                   {header}
-                  <View
+                  <TouchableOpacity
                     style={{
                       flexDirection: 'row',
                       marginBottom: 10,
@@ -191,6 +191,9 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       elevation: 4,
+                    }}
+                    onLongPress={() => {
+                      console.log('item :>> ', item);
                     }}
                   >
                     <Surface
@@ -204,7 +207,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                         borderWidth: 1,
                       }}
                     >
-                      {_.has(nextItem, 'type') && connectLastItem(item)}
+                      {_.has(nextItem, 'type') && connectNextItem(nextItem)}
                       <Text
                         style={{
                           fontSize: 20,
@@ -231,7 +234,7 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                         <AddressLine address={item.address} />
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 </>
               );
             }}
