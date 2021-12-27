@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView, View, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import * as Location from 'expo-location';
@@ -91,7 +91,7 @@ export default function Home({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, marginTop: StatusBar.currentHeight }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 15 }}>
         <Ionicons
           name={'settings'}
@@ -110,7 +110,12 @@ export default function Home({ navigation }) {
           }}
         />
       </View>
-      <History bookings={bookings} getNextBookings={getNextBookings} refreshing={refreshing} />
+      <History
+        bookings={bookings}
+        getBookings={getBookings}
+        getNextBookings={getNextBookings}
+        refreshing={refreshing}
+      />
       <BookingButtons addBooking={addBooking} lastBookingType={lastBookingType} />
     </SafeAreaView>
   );

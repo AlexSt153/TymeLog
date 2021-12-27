@@ -1,11 +1,19 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, FlatList, useWindowDimensions, TouchableOpacity } from 'react-native';
+import React from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  useWindowDimensions,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { Text, Surface, Colors, Card } from 'react-native-paper';
 import moment from 'moment';
 import AddressLine from './AddressLine';
 import BookingHeader from './BookingHeader';
 import WebFlatListWrapper from '../tools/WebFlatListWrapper';
 import { isWeb } from '../tools/deviceInfo';
+import { supabase } from '../../lib/supabase';
 
 const _ = require('lodash');
 
@@ -81,8 +89,21 @@ const connectNextItem = (nextItem) => {
   );
 };
 
-export default function History({ bookings, getNextBookings, refreshing }) {
-  const flatListRef = useRef(null);
+const deleteBooking = async (booking, getBookings) => {
+  const { id } = booking;
+
+  const { data, error } = await supabase.from('bookings').delete().match({ id });
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  console.log(data);
+  getBookings();
+};
+
+export default function History({ bookings, getBookings, getNextBookings, refreshing }) {
   const { width } = useWindowDimensions();
 
   const styles = StyleSheet.create({
@@ -99,20 +120,6 @@ export default function History({ bookings, getNextBookings, refreshing }) {
     },
   });
 
-  useEffect(() => {
-    try {
-      // console.log('bookings[-1] :>> ', bookings[-1]);
-      // console.log('bookings[0] :>> ', bookings[0]);
-      // console.log('bookings[1] :>> ', bookings[1]);
-
-      if (flatListRef.current) {
-        // flatListRef.current.scrollToEnd({ animated: true });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [bookings]);
-
   const ITEM_HEIGHT = 80;
 
   return (
@@ -120,16 +127,12 @@ export default function History({ bookings, getNextBookings, refreshing }) {
       {bookings.length > 0 ? (
         <WebFlatListWrapper>
           <FlatList
-            ref={flatListRef}
             style={{ flex: 1, width: '100%' }}
             data={bookings}
-            // initialScrollIndex={bookings.length - 1}
             getItemLayout={(data, index) => {
               if (isWeb) return null;
               return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
             }}
-            refreshing={refreshing}
-            onRefresh={() => getNextBookings(100)}
             keyExtractor={(item) => item.id.toString()}
             renderItem={(listItem) => {
               const { item } = listItem;
@@ -194,6 +197,18 @@ export default function History({ bookings, getNextBookings, refreshing }) {
                     }}
                     onLongPress={() => {
                       console.log('item :>> ', item);
+                      Alert.alert('Delete', 'Are you sure you want to delete this booking?', [
+                        {
+                          text: 'Cancel',
+                          style: 'cancel',
+                        },
+                        {
+                          text: 'Delete',
+                          onPress: () => {
+                            deleteBooking(item, getBookings);
+                          },
+                        },
+                      ]);
                     }}
                   >
                     <Surface
