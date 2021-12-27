@@ -7,7 +7,7 @@ module.exports = () => {
     expo: {
       name: 'TymeLog',
       slug: 'TymeLog',
-      version: '1.0.1',
+      version: '0.0.2',
       orientation: 'portrait',
       icon: './assets/icon.png',
       splash: {
