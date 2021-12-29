@@ -1,107 +1,12 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Text, Surface, Colors, Card } from 'react-native-paper';
+import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
+import { Text, Card } from 'react-native-paper';
 import moment from 'moment';
-import AddressLine from './AddressLine';
+import * as _ from 'lodash';
 import BookingHeader from './BookingHeader';
 import WebFlatListWrapper from '../tools/WebFlatListWrapper';
 import { isWeb } from '../tools/deviceInfo';
-import { supabase } from '../../lib/supabase';
-
-const _ = require('lodash');
-
-const backgroundColor = (type) => {
-  switch (type) {
-    case 'start':
-      return Colors.green600;
-    case 'pause':
-      return Colors.blue600;
-    case 'end':
-      return Colors.red600;
-    default:
-      return null;
-  }
-};
-
-const textColor = (type) => {
-  switch (type) {
-    case 'start':
-      return Colors.green100;
-    case 'pause':
-      return Colors.blue100;
-    case 'end':
-      return Colors.red100;
-    default:
-      return null;
-  }
-};
-
-const borderColor = (type) => {
-  switch (type) {
-    case 'start':
-      return Colors.green600;
-    case 'pause':
-      return Colors.blue600;
-    case 'end':
-      return Colors.red600;
-    default:
-      return null;
-  }
-};
-
-const lineColor = (type) => {
-  switch (type) {
-    case 'start':
-      return Colors.green600;
-    case 'pause':
-      return Colors.blue600;
-    case 'end':
-      return Colors.red600;
-    default:
-      return null;
-  }
-};
-
-const connectNextItem = (nextItem) => {
-  if (nextItem.type === 'end') return null;
-
-  return (
-    <Surface
-      style={{
-        position: 'absolute',
-        left: 12.5,
-        bottom: -42,
-        height: 40,
-        width: 2,
-        elevation: 4,
-        backgroundColor: lineColor(nextItem.type),
-      }}
-    >
-      <View />
-    </Surface>
-  );
-};
-
-const deleteBooking = async (booking, getBookings) => {
-  const { id } = booking;
-
-  const { data, error } = await supabase.from('bookings').delete().match({ id });
-
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(data);
-  getBookings();
-};
+import Booking from './Booking';
 
 export default function History({ bookings, getBookings, getNextBookings, refreshing }) {
   const { width } = useWindowDimensions();
@@ -138,7 +43,7 @@ export default function History({ bookings, getBookings, getNextBookings, refres
               const { item } = listItem;
               let lastItem = null;
               let nextItem = null;
-              let header = null;
+              let header: React.ReactNode | null = null;
 
               try {
                 lastItem = bookings[listItem.index - 1];
@@ -182,75 +87,12 @@ export default function History({ bookings, getBookings, getNextBookings, refres
               }
 
               return (
-                <>
-                  {header}
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: 'row',
-                      marginBottom: 10,
-                      padding: 8,
-                      height: 60,
-                      width: '100%',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      elevation: 4,
-                    }}
-                    onLongPress={() => {
-                      console.log('item :>> ', item);
-                      Alert.alert('Delete', 'Are you sure you want to delete this booking?', [
-                        {
-                          text: 'Cancel',
-                          style: 'cancel',
-                        },
-                        {
-                          text: 'Delete',
-                          onPress: () => {
-                            deleteBooking(item, getBookings);
-                          },
-                        },
-                      ]);
-                    }}
-                  >
-                    <Surface
-                      style={{
-                        height: 30,
-                        width: 30,
-                        borderRadius: 15,
-                        marginRight: 10,
-                        backgroundColor: backgroundColor(item.type),
-                        borderColor: borderColor(item.type),
-                        borderWidth: 1,
-                      }}
-                    >
-                      {_.has(nextItem, 'type') && connectNextItem(nextItem)}
-                      <Text
-                        style={{
-                          fontSize: 20,
-                          paddingTop: 2,
-                          color: textColor(item.type),
-                          textAlign: 'center',
-                          textAlignVertical: 'center',
-                        }}
-                      >
-                        {item.type[0].toUpperCase()}
-                      </Text>
-                    </Surface>
-                    <View
-                      style={{
-                        width: '80%',
-                        flexDirection: 'column',
-                        marginTop: 10,
-                      }}
-                    >
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text>{moment(item.timestamp).format('HH:mm:ss')}</Text>
-                      </View>
-                      <View style={{ flexDirection: 'row' }}>
-                        <AddressLine address={item.address} />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </>
+                <Booking
+                  header={header}
+                  item={item}
+                  nextItem={nextItem}
+                  getBookings={getBookings}
+                />
               );
             }}
           />
