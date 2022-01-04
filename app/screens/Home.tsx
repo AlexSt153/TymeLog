@@ -90,6 +90,8 @@ export default function Home({ navigation }) {
     getBookings();
   };
 
+  // TODO: add a button to add a geofencing location
+
   return (
     <SafeAreaView style={{ flex: 1, marginTop: StatusBar.currentHeight }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 15 }}>

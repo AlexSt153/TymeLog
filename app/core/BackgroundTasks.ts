@@ -16,6 +16,7 @@ export default function BackgroundTasks() {
     const geofencingIsEnabled = await Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME);
     console.log(`geofencingIsEnabled`, geofencingIsEnabled);
     if (geofencingIsEnabled === false) {
+      // TODO: uncomment startGeofenceTracking() when geofencion feature is ready
       // await startGeofenceTracking();
     }
 

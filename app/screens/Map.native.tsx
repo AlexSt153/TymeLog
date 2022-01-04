@@ -31,6 +31,8 @@ const styles = StyleSheet.create({
   },
 });
 
+// TODO: Add props to launch in geofencingAdd mode -> select point on map or search for address, show old/all geofences on map
+
 export default function Map({ navigation }) {
   const route = useRoute();
   // @ts-ignore
@@ -83,6 +85,7 @@ export default function Map({ navigation }) {
   };
 
   useEffect(() => {
+    // get bookings or geofences from DB depending on mode
     const unsubscribe = navigation.addListener('focus', () => {
       getBookingsFromDB();
     });

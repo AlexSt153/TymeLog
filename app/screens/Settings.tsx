@@ -24,13 +24,19 @@ const styles = StyleSheet.create({
   card: { paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5 },
 });
 
-export default function Settings({ navigation }) {
+export default function Settings() {
   const { dark } = useTheme();
 
   const theme = useStore((state) => state.theme);
   const setTheme = useStore((state) => state.setTheme);
   const session = useStore((state) => state.session);
   const setSession = useStore((state) => state.setSession);
+  const userAllowedBackgroundLocation = useStore((state) => state.userAllowedBackgroundLocation);
+  const setUserAllowedBackgroundLocation = useStore(
+    (state) => state.setUserAllowedBackgroundLocation
+  );
+  const userAllowedNotifications = useStore((state) => state.userAllowedNotifications);
+  const setUserAllowedNotifications = useStore((state) => state.setUserAllowedNotifications);
 
   const [hasForegroundLocationPermission, setHasForegroundLocationPermission] = useState({
     granted: false,
@@ -43,34 +49,33 @@ export default function Settings({ navigation }) {
   const [hasBackgroundLocationUpdates, setHasBackgroundLocationUpdates] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      Location.getForegroundPermissionsAsync().then((permissions) => {
-        setHasForegroundLocationPermission(permissions);
-      });
-
-      Location.getBackgroundPermissionsAsync().then((permissions) => {
-        setHasBackgroundLocationPermission(permissions);
-      });
-
-      Notifications.getPermissionsAsync().then((permissions) => {
-        setHasNotificationPermission(permissions);
-      });
-
-      if (isNotWeb) {
-        Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
-          setHasGeofencingStarted(started);
-        });
-
-        Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
-          setHasBackgroundLocationUpdates(started);
-        });
-      }
-
-      console.log('session :>> ', session);
+    Location.getForegroundPermissionsAsync().then((permissions) => {
+      setHasForegroundLocationPermission(permissions);
     });
 
-    return unsubscribe;
-  }, [navigation]);
+    Location.getBackgroundPermissionsAsync().then((permissions) => {
+      setHasBackgroundLocationPermission(permissions);
+    });
+
+    Notifications.getPermissionsAsync().then((permissions) => {
+      setHasNotificationPermission(permissions);
+    });
+
+    if (isNotWeb) {
+      Location.hasStartedGeofencingAsync(GEOFENCING_TASK_NAME).then((started) => {
+        setHasGeofencingStarted(started);
+      });
+
+      Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK_NAME).then((started) => {
+        setHasBackgroundLocationUpdates(started);
+      });
+    }
+
+    console.log('session :>> ', session);
+  }, []);
+
+  // TODO: combine permissions, tasks and location
+  // TODO: only hint missing permissions - remove indicator
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -94,27 +99,45 @@ export default function Settings({ navigation }) {
             <List.Item
               title="Background Location"
               right={() => (
-                <View
-                  style={[
-                    styles.indicator,
-                    {
-                      backgroundColor: hasBackgroundLocationPermission.granted ? 'green' : 'red',
-                    },
-                  ]}
-                />
+                <>
+                  <View
+                    style={[
+                      styles.indicator,
+                      {
+                        backgroundColor: hasBackgroundLocationPermission.granted ? 'green' : 'red',
+                        marginRight: 10,
+                      },
+                    ]}
+                  />
+                  <Switch
+                    value={userAllowedBackgroundLocation}
+                    onValueChange={() => {
+                      setUserAllowedBackgroundLocation(!userAllowedBackgroundLocation);
+                    }}
+                  />
+                </>
               )}
             />
             <List.Item
               title="Notifications"
               right={() => (
-                <View
-                  style={[
-                    styles.indicator,
-                    {
-                      backgroundColor: hasNotificationPermission.granted ? 'green' : 'red',
-                    },
-                  ]}
-                />
+                <>
+                  <View
+                    style={[
+                      styles.indicator,
+                      {
+                        backgroundColor: hasNotificationPermission.granted ? 'green' : 'red',
+                        marginRight: 10,
+                      },
+                    ]}
+                  />
+                  <Switch
+                    value={userAllowedNotifications}
+                    onValueChange={() => {
+                      setUserAllowedNotifications(!userAllowedNotifications);
+                    }}
+                  />
+                </>
               )}
             />
           </Card>

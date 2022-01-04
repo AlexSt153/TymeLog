@@ -57,6 +57,7 @@ export default function BackgroundItem({ item }: IBackgroundItem) {
           enablePanDownToClose
         >
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            {/* TODO: add functions to save data to server */}
             <Text>convert background item</Text>
             <Text>choose start, pause or end</Text>
             <Text>confirm date and time</Text>

@@ -75,6 +75,8 @@ const connectNextItem = (nextItem) => {
   );
 };
 
+// TODO: add a way to select the booking item for bulk actions
+
 export default function BookingIcon({ item, nextItem }) {
   return (
     <Surface

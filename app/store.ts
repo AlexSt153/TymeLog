@@ -23,6 +23,12 @@ type MainState = {
   setInitialRegion: (initialRegion: Region) => void;
   regions: Array<object>;
   setRegions: (regions: Array<object>) => void;
+  userAllowedForegroundLocation: boolean;
+  setUserAllowedForegroundLocation: (userAllowedForegroundLocation: boolean) => void;
+  userAllowedBackgroundLocation: boolean;
+  setUserAllowedBackgroundLocation: (userAllowedBackgroundLocation: boolean) => void;
+  userAllowedNotifications: boolean;
+  setUserAllowedNotifications: (userAllowedNotifications: boolean) => void;
 };
 
 export const useStore = create<MainState>(
@@ -36,10 +42,19 @@ export const useStore = create<MainState>(
       setBookings: (bookings) => set(() => ({ bookings })),
       lastBooking: { type: '', timestamp: 0, data: '' },
       setLastBooking: (lastBooking) => set(() => ({ lastBooking })),
-      initialRegion: {},
+      initialRegion: { latitude: 0, longitude: 0, latitudeDelta: 0, longitudeDelta: 0 },
       setInitialRegion: (region) => set(() => ({ region })),
       regions: [],
       setRegions: (regions) => set(() => ({ regions })),
+      userAllowedForegroundLocation: false,
+      setUserAllowedForegroundLocation: (userAllowedForegroundLocation) =>
+        set(() => ({ userAllowedForegroundLocation })),
+      userAllowedBackgroundLocation: false,
+      setUserAllowedBackgroundLocation: (userAllowedBackgroundLocation) =>
+        set(() => ({ userAllowedBackgroundLocation })),
+      userAllowedNotifications: false,
+      setUserAllowedNotifications: (userAllowedNotifications) =>
+        set(() => ({ userAllowedNotifications })),
     }),
     {
       name: 'main-storage',

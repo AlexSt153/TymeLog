@@ -10,6 +10,7 @@ import * as Location from 'expo-location';
 // @ts-ignore
 import { SENTRY_DSN, WEB_GOOGLE_MAPS_API_KEY } from '@env';
 import { isWeb, isNotWeb } from './app/tools/deviceInfo';
+import { useStore } from './app/store';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -22,6 +23,9 @@ if (isWeb) {
 }
 
 export default function App() {
+  const userAllowedBackgroundLocation = useStore((state) => state.userAllowedBackgroundLocation);
+  const userAllowedNotifications = useStore((state) => state.userAllowedNotifications);
+
   useEffect(() => {
     if (!__DEV__) initialiseOtaManager({});
   }, []);
@@ -30,8 +34,8 @@ export default function App() {
     <>
       <StatusBar style="auto" />
       {isNotWeb && <BackgroundTasks />}
-      {isNotWeb && <BackgroundLocationTask />}
-      {isNotWeb && <NotificationHandler />}
+      {isNotWeb && userAllowedBackgroundLocation && <BackgroundLocationTask />}
+      {isNotWeb && userAllowedNotifications && <NotificationHandler />}
       <Navigation />
     </>
   );

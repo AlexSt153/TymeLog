@@ -125,6 +125,7 @@ TaskManager.defineTask(BACKGROUND_LOCATION_TASK_NAME, ({ data: { locations }, er
       if (distance >= 100) {
         lastLocation = locations[locations.length - 1];
 
+        // TODO: notification to assign booking another type or write a note
         // presentNotificationAsync({
         //   title: 'Received new locations',
         //   body: JSON.stringify(locations[locations.length - 1]),
