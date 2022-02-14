@@ -13,8 +13,8 @@ const localStyles = StyleSheet.create({
   },
   headline: {},
   title: {},
-  subheading: {},
-  text: { marginBottom: 20 },
+  subheading: { fontWeight: '200' },
+  text: { marginBottom: 20, fontWeight: '300' },
   button: {},
 });
 

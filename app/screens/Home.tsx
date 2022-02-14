@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import * as Location from 'expo-location';
 import moment from 'moment';
 import { useStore } from '../store';
@@ -29,13 +29,35 @@ export default function Home({ navigation }) {
       .from('bookings')
       .select('*')
       .range(0, 100)
-      .neq('type', 'background')
       .order('timestamp', { ascending: false });
+
+    const bookingsByTimestamp = {};
+    data.forEach((item) => {
+      const key = moment(item.timestamp).format('YYYY-MM-DD');
+
+      if (!bookingsByTimestamp[key]) {
+        bookingsByTimestamp[key] = {};
+      }
+
+      if (!bookingsByTimestamp[key]['dayBookings']) {
+        bookingsByTimestamp[key]['dayBookings'] = [];
+      }
+
+      if (!bookingsByTimestamp[key]['background']) {
+        bookingsByTimestamp[key]['background'] = [];
+      }
+
+      if (item.type === 'start' || item.type === 'pause' || item.type === 'end') {
+        bookingsByTimestamp[key]['dayBookings'].push(item);
+      } else if (item.type === 'background') {
+        bookingsByTimestamp[key]['background'].push(item);
+      }
+    });
 
     if (error) {
       console.log(error);
     } else {
-      setBookings(data);
+      setBookings(bookingsByTimestamp);
       setRefreshing(false);
     }
   };

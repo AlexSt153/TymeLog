@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { Text, useTheme as usePaperTheme } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import moment from 'moment';
 interface Props {
   date: string;
   dayBookings: any[];
+  backgroundBookingCount: number;
 }
 
 export const calculateMinutesWorked = (dayBookings: any[]): number => {
@@ -37,14 +38,14 @@ export const calculateMinutesWorked = (dayBookings: any[]): number => {
   return minutesWorked;
 };
 
-export default function BookingHeader({ date, dayBookings }: Props) {
+export default function BookingHeader({ date, dayBookings, backgroundBookingCount }: Props) {
   const navigation = useNavigation();
   const { dark } = useTheme();
   const { colors } = usePaperTheme();
   const formatedDate = moment(date).format('LL');
 
   if (formatedDate === 'Invalid date') return null;
-  const workedMinutes = calculateMinutesWorked(dayBookings);
+  const workedMinutes = calculateMinutesWorked(dayBookings?.reverse());
   const workedHours = (workedMinutes / 60).toFixed(2).split('.')[0];
   const remainingMinutes = workedMinutes % 60;
 
@@ -61,17 +62,22 @@ export default function BookingHeader({ date, dayBookings }: Props) {
       }}
     >
       <Text>{formatedDate}</Text>
-      <Text>
-        {workedHours}h {remainingMinutes}m
-      </Text>
-      <Ionicons
-        name={'map'}
-        size={20}
-        color={colors.text}
+      {dayBookings && (
+        <Text>
+          {workedHours}h {remainingMinutes}m
+        </Text>
+      )}
+      <TouchableOpacity
+        style={{ flexDirection: 'row', alignItems: 'center' }}
         onPress={() => {
           navigation.navigate('Map', { date });
         }}
-      />
+      >
+        <Ionicons name={'map'} size={20} color={colors.text} />
+        {backgroundBookingCount > 0 && (
+          <Text style={{ marginLeft: 5 }}>{backgroundBookingCount}</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }

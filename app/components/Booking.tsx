@@ -22,16 +22,14 @@ const deleteBooking = async (booking, getBookings) => {
 };
 
 interface IBooking {
-  header: React.ReactNode | null;
   item: any;
   nextItem: any;
   getBookings: () => void;
 }
 
-export default function Booking({ header, item, nextItem, getBookings }: IBooking) {
+export default function Booking({ item, nextItem, getBookings }: IBooking) {
   return (
     <>
-      {header}
       <TouchableOpacity
         style={{
           flexDirection: 'row',

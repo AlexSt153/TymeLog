@@ -45,18 +45,18 @@ const borderColor = (type) => {
 const lineColor = (type) => {
   switch (type) {
     case 'start':
-      return Colors.green600;
-    case 'pause':
       return Colors.blue600;
+    case 'pause':
+      return Colors.green600;
     case 'end':
-      return Colors.red600;
+      return Colors.green600;
     default:
       return null;
   }
 };
 
-const connectNextItem = (nextItem) => {
-  if (nextItem.type === 'end') return null;
+const connectNextItem = (item, nextItem) => {
+  if (item?.type === 'end') return null;
 
   return (
     <Surface
@@ -78,30 +78,35 @@ const connectNextItem = (nextItem) => {
 // TODO: add a way to select the booking item for bulk actions
 
 export default function BookingIcon({ item, nextItem }) {
-  return (
-    <Surface
-      style={{
-        height: 30,
-        width: 30,
-        borderRadius: 15,
-        marginRight: 10,
-        backgroundColor: backgroundColor(item.type),
-        borderColor: borderColor(item.type),
-        borderWidth: 1,
-      }}
-    >
-      {_.has(nextItem, 'type') && connectNextItem(nextItem)}
-      <Text
+  try {
+    return (
+      <Surface
         style={{
-          fontSize: 20,
-          paddingTop: 2,
-          color: textColor(item.type),
-          textAlign: 'center',
-          textAlignVertical: 'center',
+          height: 30,
+          width: 30,
+          borderRadius: 15,
+          marginRight: 10,
+          backgroundColor: backgroundColor(item.type),
+          borderColor: borderColor(item.type),
+          borderWidth: 1,
         }}
       >
-        {item.type[0].toUpperCase()}
-      </Text>
-    </Surface>
-  );
+        {_.has(nextItem, 'type') && connectNextItem(item, nextItem)}
+        <Text
+          style={{
+            fontSize: 20,
+            paddingTop: 2,
+            color: textColor(item.type),
+            textAlign: 'center',
+            textAlignVertical: 'center',
+          }}
+        >
+          {item.type[0].toUpperCase()}
+        </Text>
+      </Surface>
+    );
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 }

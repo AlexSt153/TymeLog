@@ -5,7 +5,6 @@ import moment from 'moment';
 import * as _ from 'lodash';
 import BookingHeader from './BookingHeader';
 import WebFlatListWrapper from '../tools/WebFlatListWrapper';
-import { isWeb } from '../tools/deviceInfo';
 import Booking from './Booking';
 
 export default function History({ bookings, getBookings, getNextBookings, refreshing }) {
@@ -29,70 +28,31 @@ export default function History({ bookings, getBookings, getNextBookings, refres
 
   return (
     <Card style={styles.container}>
-      {bookings.length > 0 ? (
+      {Object.keys(bookings).length > 0 ? (
         <WebFlatListWrapper>
           <FlatList
             style={{ flex: 1, width: '100%' }}
-            data={bookings}
-            getItemLayout={(data, index) => {
-              if (isWeb) return null;
-              return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
-            }}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={(listItem) => {
-              const { item } = listItem;
-              let lastItem = null;
-              let nextItem = null;
-              let header: React.ReactNode | null = null;
-
-              try {
-                lastItem = bookings[listItem.index - 1];
-              } catch (error) {
-                console.log('error create lastItem', error);
-              }
-
-              try {
-                nextItem = bookings[listItem.index + 1];
-              } catch (error) {
-                console.log('error create nextItem', error);
-              }
-
-              try {
-                if (lastItem === undefined) {
-                  const dayBookings = _.filter(bookings, (booking) => {
-                    return moment(booking.timestamp).isSame(
-                      moment(item.timestamp).format('YYYY-MM-DD'),
-                      'day'
-                    );
-                  });
-
-                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
-                }
-
-                if (
-                  lastItem.type === 'start' &&
-                  !moment(lastItem.timestamp).isSame(item.timestamp, 'day')
-                ) {
-                  const dayBookings = _.filter(bookings, (booking) => {
-                    return moment(booking.timestamp).isSame(
-                      moment(item.timestamp).format('YYYY-MM-DD'),
-                      'day'
-                    );
-                  });
-
-                  header = <BookingHeader date={item.timestamp} dayBookings={dayBookings} />;
-                }
-              } catch (error) {
-                console.log(error);
-              }
+            data={Object.keys(bookings).sort((a, b) => moment(b).diff(a))}
+            renderItem={({ item }) => {
+              const backgroundBookings: any[] = bookings[item]['background'];
+              let dayBookings: any[] = bookings[item]['dayBookings'];
+              dayBookings = _.orderBy(dayBookings, ['timestamp'], ['asc']);
 
               return (
-                <Booking
-                  header={header}
-                  item={item}
-                  nextItem={nextItem}
-                  getBookings={getBookings}
-                />
+                <>
+                  <BookingHeader
+                    date={item}
+                    dayBookings={dayBookings?.length > 0 ? dayBookings : null}
+                    backgroundBookingCount={backgroundBookings?.length}
+                  />
+                  {dayBookings?.map((booking, index) => (
+                    <Booking
+                      item={booking}
+                      nextItem={dayBookings[index + 1]}
+                      getBookings={getBookings}
+                    />
+                  ))}
+                </>
               );
             }}
           />
