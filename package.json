@@ -6,7 +6,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest"
+    "test": "jest",
+    "tauri": "tauri"
   },
   "jest": {
     "preset": "jest-expo"
@@ -61,6 +62,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@expo/webpack-config": "~0.16.2",
+    "@tauri-apps/cli": "^1.0.0-rc.5",
     "@types/lodash": "^4.14.178",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
